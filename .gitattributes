@@ -1,0 +1,6 @@
+*.out
+settings.json
+.DS_Store
+
+*.c linguist-language=c
+*.html linguist-language=md
