@@ -93,7 +93,7 @@ public:
 template<class T>
 BasicMatrix<T>::BasicMatrix(int row, int col):Matrix<T>(row, col) {
     this->data = new T[row * col];
-    std::memset(data, 0, sizeof(data));
+    std::memset(data, 0, sizeof(T)*row*col);
 }
 
 template<class T>
