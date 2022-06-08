@@ -124,54 +124,55 @@ public:
 
      virtual void crossProduct(const SparseMatrix<T> &) = 0;
 
-//
-//    virtual Matrix &transpose() = 0;
-//
-//    virtual Matrix &inverse() = 0;
-//
-//    virtual Matrix &conjugate() = 0;
-//
-//    virtual T getMax() = 0;
-//
-//    virtual T getMin() = 0;
-//
-//    virtual T getSum() = 0;
-//
-//    virtual T getAvg() = 0;
-//
-//    virtual T getMaxRow(int) = 0;
-//
-//    virtual T getMaxCol(int) = 0;
-//
-//    virtual T getMinRow(int) = 0;
-//
-//    virtual T getMinCol(int) = 0;
-//
-//    virtual T getSumRow(int) = 0;
-//
-//    virtual T getSumCol(int) = 0;
-//
-//    virtual T getAvgRow(int) = 0;
-//
-//    virtual T getAvgCol(int) = 0;
-//
-//    virtual T getEigenvalue() = 0;
-//
-//    virtual Matrix& getEigenvector() = 0;
-//
-//    virtual T getTrace() = 0;
-//
-//    virtual T getDeterminant() = 0;
-//
-//    virtual void reshape(int row, int col) = 0;
-//
-//    virtual void sliceRow(int row1, int row2) = 0;
-//
-//    virtual void sliceCol(int col1, int col2) = 0;
-//
-//    virtual void slice(int row1, int row2, int col1, int col2) = 0;
-//
-//    virtual Matrix& convolve(Matrix&) = 0;
+    virtual void transpose() = 0;
+
+    virtual void inverse() = 0;
+
+    virtual void conjugate() = 0;
+
+    virtual T getMax() = 0;
+
+    virtual T getMin() = 0;
+
+    virtual T getSum() = 0;
+
+    virtual T getAvg() = 0;
+
+    virtual T getRowMax(int) = 0;
+
+    virtual T getColMax(int) = 0;
+
+    virtual T getRowMin(int) = 0;
+
+    virtual T getColMin(int) = 0;
+
+    virtual T getRowSum(int) = 0;
+
+    virtual T getColSum(int) = 0;
+
+    virtual T getRowAvg(int) = 0;
+
+    virtual T getColAvg(int) = 0;
+
+    virtual T getEigenvalue() = 0;
+
+    virtual Matrix<T>& getEigenvector() = 0;
+
+    virtual T getTrace() = 0;
+
+    virtual T getDeterminant() = 0;
+
+    virtual void reshape(int row, int col) = 0;
+
+    virtual void sliceRow(int row1, int row2) = 0;
+
+    virtual void sliceCol(int col1, int col2) = 0;
+
+    virtual void slice(int row1, int row2, int col1, int col2) = 0;
+
+    virtual Matrix<T>& convolve(BasicMatrix<T>&) = 0;
+
+    virtual Matrix<T>& convolve(SparseMatrix<T>&) = 0;
 
 };
 

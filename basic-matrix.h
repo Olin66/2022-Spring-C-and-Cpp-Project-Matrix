@@ -95,6 +95,56 @@ public:
     void crossProduct(const BasicMatrix<T> &);
 
     void crossProduct(const SparseMatrix<T> &);
+
+    void transpose();
+
+    void inverse();
+
+    void conjugate();
+
+    T getMax();
+
+    T getMin();
+
+    T getSum();
+
+    T getAvg();
+
+    T getRowMax(int);
+
+    T getColMax(int);
+
+    T getRowMin(int);
+
+    T getColMin(int);
+
+    T getRowSum(int);
+
+    T getColSum(int);
+
+    T getRowAvg(int);
+
+    T getColAvg(int);
+
+    T getEigenvalue();
+
+    Matrix<T>& getEigenvector();
+
+    T getTrace();
+
+    T getDeterminant();
+
+    void reshape(int row, int col);
+
+    void sliceRow(int row1, int row2);
+
+    void sliceCol(int col1, int col2);
+
+    void slice(int row1, int row2, int col1, int col2);
+
+    Matrix<T>& convolve(BasicMatrix<T>&);
+
+    Matrix<T>& convolve(SparseMatrix<T>&);
 };
 
 template<class T>
@@ -262,6 +312,113 @@ void BasicMatrix<T>::crossProduct(const BasicMatrix<T> &) {
 template<class T>
 void BasicMatrix<T>::crossProduct(const SparseMatrix<T> &) {
 
+}
+
+template<class T>
+void BasicMatrix<T>::transpose() {
+
+}
+
+template<class T>
+void BasicMatrix<T>::inverse() {
+
+}
+
+template<class T>
+void BasicMatrix<T>::conjugate() {
+
+}
+
+template<class T>
+T BasicMatrix<T>::getMax() {
+}
+
+template<class T>
+T BasicMatrix<T>::getMin() {
+}
+
+template<class T>
+T BasicMatrix<T>::getSum() {
+}
+
+template<class T>
+T BasicMatrix<T>::getAvg() {
+}
+
+template<class T>
+T BasicMatrix<T>::getEigenvalue() {
+}
+
+template<class T>
+T BasicMatrix<T>::getRowMin(int) {
+}
+
+template<class T>
+T BasicMatrix<T>::getColMin(int) {
+}
+
+template<class T>
+T BasicMatrix<T>::getRowMax(int) {
+}
+
+template<class T>
+T BasicMatrix<T>::getColMax(int) {
+}
+
+template<class T>
+T BasicMatrix<T>::getRowSum(int) {
+}
+
+template<class T>
+T BasicMatrix<T>::getColSum(int) {
+}
+
+template<class T>
+T BasicMatrix<T>::getRowAvg(int) {
+}
+
+template<class T>
+T BasicMatrix<T>::getColAvg(int) {
+}
+
+template<class T>
+Matrix<T> &BasicMatrix<T>::getEigenvector() {
+}
+
+template<class T>
+T BasicMatrix<T>::getTrace() {
+}
+
+template<class T>
+T BasicMatrix<T>::getDeterminant() {
+}
+
+template<class T>
+void BasicMatrix<T>::reshape(int row, int col) {
+
+}
+
+template<class T>
+void BasicMatrix<T>::sliceRow(int row1, int row2) {
+
+}
+
+template<class T>
+void BasicMatrix<T>::sliceCol(int col1, int col2) {
+
+}
+
+template<class T>
+void BasicMatrix<T>::slice(int row1, int row2, int col1, int col2) {
+
+}
+
+template<class T>
+Matrix<T> &BasicMatrix<T>::convolve(BasicMatrix<T> &) {
+}
+
+template<class T>
+Matrix<T> &BasicMatrix<T>::convolve(SparseMatrix<T> &) {
 }
 
 #endif
