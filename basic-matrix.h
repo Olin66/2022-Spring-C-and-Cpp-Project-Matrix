@@ -24,69 +24,69 @@ public:
 
     BasicMatrix(std::vector<std::vector<T>>);
 
-    Matrix<T> &add(const BasicMatrix<T> &);
+    void add(const BasicMatrix<T> &);
 
-    Matrix<T> &add(const SparseMatrix<T> &);
+    void add(const SparseMatrix<T> &);
 
-    Matrix<T> &subtract(const BasicMatrix<T> &);
+    void subtract(const BasicMatrix<T> &);
 
-    Matrix<T> &subtract(const SparseMatrix<T> &);
+    void subtract(const SparseMatrix<T> &);
 
-    Matrix<T> &scalarMultiply(short);
+    void scalarMultiply(short);
 
-    Matrix<T> &scalarMultiply(int);
+    void scalarMultiply(int);
 
-    Matrix<T> &scalarMultiply(long);
+    void scalarMultiply(long);
 
-    Matrix<T> &scalarMultiply(long long);
+    void scalarMultiply(long long);
 
-    Matrix<T> &scalarMultiply(float);
+    void scalarMultiply(float);
 
-    Matrix<T> &scalarMultiply(double);
+    void scalarMultiply(double);
 
-    Matrix<T> &scalarMultiply(long double);
+    void scalarMultiply(long double);
 
-    Matrix<T> &scalarMultiply(std::complex<short>);
+    void scalarMultiply(std::complex<short>);
 
-    Matrix<T> &scalarMultiply(std::complex<int>);
+    void scalarMultiply(std::complex<int>);
 
-    Matrix<T> &scalarMultiply(std::complex<long>);
+    void scalarMultiply(std::complex<long>);
 
-    Matrix<T> &scalarMultiply(std::complex<long long>);
+    void scalarMultiply(std::complex<long long>);
 
-    Matrix<T> &scalarMultiply(std::complex<float>);
+    void scalarMultiply(std::complex<float>);
 
-    Matrix<T> &scalarMultiply(std::complex<double>);
+    void scalarMultiply(std::complex<double>);
 
-    Matrix<T> &scalarMultiply(std::complex<long double>);
+    void scalarMultiply(std::complex<long double>);
 
-    Matrix<T> &scalarDivide(short);
+    void scalarDivide(short);
 
-    Matrix<T> &scalarDivide(int);
+    void scalarDivide(int);
 
-    Matrix<T> &scalarDivide(long);
+    void scalarDivide(long);
 
-    Matrix<T> &scalarDivide(long long);
+    void scalarDivide(long long);
 
-    Matrix<T> &scalarDivide(float);
+    void scalarDivide(float);
 
-    Matrix<T> &scalarDivide(double);
+    void scalarDivide(double);
 
-    Matrix<T> &scalarDivide(long double);
+    void scalarDivide(long double);
 
-    Matrix<T> &scalarDivide(std::complex<short>);
+    void scalarDivide(std::complex<short>);
 
-    Matrix<T> &scalarDivide(std::complex<int>);
+    void scalarDivide(std::complex<int>);
 
-    Matrix<T> &scalarDivide(std::complex<long>);
+    void scalarDivide(std::complex<long>);
 
-    Matrix<T> &scalarDivide(std::complex<long long>);
+    void scalarDivide(std::complex<long long>);
 
-    Matrix<T> &scalarDivide(std::complex<float>);
+    void scalarDivide(std::complex<float>);
 
-    Matrix<T> &scalarDivide(std::complex<double>);
+    void scalarDivide(std::complex<double>);
 
-    Matrix<T> &scalarDivide(std::complex<long double>);
+    void scalarDivide(std::complex<long double>);
 
 };
 
@@ -107,163 +107,134 @@ BasicMatrix<T>::BasicMatrix(std::vector<std::vector<T>> mat): Matrix<T>(mat.size
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::add(const BasicMatrix<T> &right) {
-    return (*this);
+void BasicMatrix<T>::add(const BasicMatrix<T> &right) {
+    for (size_t i = 0;i < this->getSize();i++){
+        this->data[i] = this->data[i] + right.data[i];
+    }
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::add(const SparseMatrix<T> &) {
-    return (*this);
+void BasicMatrix<T>::add(const SparseMatrix<T> &) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::subtract(const BasicMatrix<T> &) {
-    return (*this);
+void BasicMatrix<T>::subtract(const BasicMatrix<T> &) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::subtract(const SparseMatrix<T> &) {
-    return (*this);
+void BasicMatrix<T>::subtract(const SparseMatrix<T> &) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarMultiply(short) {
-    return (*this);
+void BasicMatrix<T>::scalarMultiply(short) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarMultiply(int) {
-    return (*this);
+void BasicMatrix<T>::scalarMultiply(int) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarMultiply(long) {
-    return (*this);
+void BasicMatrix<T>::scalarMultiply(long) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarMultiply(long long int) {
-    return (*this);
+void BasicMatrix<T>::scalarMultiply(long long int) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarMultiply(float) {
-    return (*this);
+void BasicMatrix<T>::scalarMultiply(float) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarMultiply(double) {
-    return (*this);
+void BasicMatrix<T>::scalarMultiply(double) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarMultiply(long double) {
-    return (*this);
+void BasicMatrix<T>::scalarMultiply(long double) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarMultiply(std::complex<short>) {
-    return (*this);
+void BasicMatrix<T>::scalarMultiply(std::complex<short>) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarMultiply(std::complex<int>) {
-    return (*this);
+void BasicMatrix<T>::scalarMultiply(std::complex<int>) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarMultiply(std::complex<long>) {
-    return (*this);
+void BasicMatrix<T>::scalarMultiply(std::complex<long>) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarMultiply(std::complex<long long int>) {
-    return (*this);
+void BasicMatrix<T>::scalarMultiply(std::complex<long long int>) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarMultiply(std::complex<float>) {
-    return (*this);
+void BasicMatrix<T>::scalarMultiply(std::complex<float>) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarMultiply(std::complex<double>) {
-    return (*this);
+void BasicMatrix<T>::scalarMultiply(std::complex<double>) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarMultiply(std::complex<long double>) {
-    return (*this);
+void BasicMatrix<T>::scalarMultiply(std::complex<long double>) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarDivide(short) {
-    return (*this);
+void BasicMatrix<T>::scalarDivide(short) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarDivide(int) {
-    return (*this);
+void BasicMatrix<T>::scalarDivide(int) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarDivide(long) {
-    return (*this);
+void BasicMatrix<T>::scalarDivide(long) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarDivide(long long int) {
-    return (*this);
+void BasicMatrix<T>::scalarDivide(long long int) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarDivide(float) {
-    return (*this);
+void BasicMatrix<T>::scalarDivide(float) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarDivide(double) {
-    return (*this);
+void BasicMatrix<T>::scalarDivide(double) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarDivide(long double) {
-    return (*this);
+void BasicMatrix<T>::scalarDivide(long double) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarDivide(std::complex<short>) {
-    return (*this);
+void BasicMatrix<T>::scalarDivide(std::complex<short>) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarDivide(std::complex<int>) {
-    return (*this);
+void BasicMatrix<T>::scalarDivide(std::complex<int>) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarDivide(std::complex<long>) {
-    return (*this);
+void BasicMatrix<T>::scalarDivide(std::complex<long>) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarDivide(std::complex<long long int>) {
-    return (*this);
+void BasicMatrix<T>::scalarDivide(std::complex<long long int>) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarDivide(std::complex<float>) {
-    return (*this);
+void BasicMatrix<T>::scalarDivide(std::complex<float>) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarDivide(std::complex<double>) {
-    return (*this);
+void BasicMatrix<T>::scalarDivide(std::complex<double>) {
 }
 
 template<class T>
-Matrix<T> &BasicMatrix<T>::scalarDivide(std::complex<long double>) {
-    return (*this);
+void BasicMatrix<T>::scalarDivide(std::complex<long double>) {
 }
 
 #endif
