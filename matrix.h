@@ -52,77 +52,77 @@ public:
         return this->col;
     }
 
-    virtual void &add(const Basicvoid &) = 0;
+    virtual void add(const BasicMatrix<T> &) = 0;
 
-    virtual void &add(const Sparsevoid &) = 0;
+    virtual void add(const SparseMatrix<T> &) = 0;
 
-    virtual void &subtract(const Basicvoid &) = 0;
+    virtual void subtract(const BasicMatrix<T> &) = 0;
 
-    virtual void &subtract(const Sparsevoid &) = 0;
+    virtual void subtract(const SparseMatrix<T> &) = 0;
 
-    virtual void &scalarMultiply(short) = 0;
+    virtual void scalarMultiply(short) = 0;
 
-    virtual void &scalarMultiply(int) = 0;
+    virtual void scalarMultiply(int) = 0;
 
-    virtual void &scalarMultiply(long) = 0;
+    virtual void scalarMultiply(long) = 0;
 
-    virtual void &scalarMultiply(long long) = 0;
+    virtual void scalarMultiply(long long) = 0;
 
-    virtual void &scalarMultiply(float) = 0;
+    virtual void scalarMultiply(float) = 0;
 
-    virtual void &scalarMultiply(double) = 0;
+    virtual void scalarMultiply(double) = 0;
 
-    virtual void &scalarMultiply(long double) = 0;
+    virtual void scalarMultiply(long double) = 0;
 
-    virtual void &scalarMultiply(std::complex<short>) = 0;
+    virtual void scalarMultiply(std::complex<short>) = 0;
 
-    virtual void &scalarMultiply(std::complex<int>) = 0;
+    virtual void scalarMultiply(std::complex<int>) = 0;
 
-    virtual void &scalarMultiply(std::complex<long>) = 0;
+    virtual void scalarMultiply(std::complex<long>) = 0;
 
-    virtual void &scalarMultiply(std::complex<long long>) = 0;
+    virtual void scalarMultiply(std::complex<long long>) = 0;
 
-    virtual void &scalarMultiply(std::complex<float>) = 0;
+    virtual void scalarMultiply(std::complex<float>) = 0;
 
-    virtual void &scalarMultiply(std::complex<double>) = 0;
+    virtual void scalarMultiply(std::complex<double>) = 0;
 
-    virtual void &scalarMultiply(std::complex<long double>) = 0;
+    virtual void scalarMultiply(std::complex<long double>) = 0;
 
-    virtual void &scalarDivide(short) = 0;
+    virtual void scalarDivide(short) = 0;
 
-    virtual void &scalarDivide(int) = 0;
+    virtual void scalarDivide(int) = 0;
 
-    virtual void &scalarDivide(long) = 0;
+    virtual void scalarDivide(long) = 0;
 
-    virtual void &scalarDivide(long long) = 0;
+    virtual void scalarDivide(long long) = 0;
 
-    virtual void &scalarDivide(float) = 0;
+    virtual void scalarDivide(float) = 0;
 
-    virtual void &scalarDivide(double) = 0;
+    virtual void scalarDivide(double) = 0;
 
-    virtual void &scalarDivide(long double) = 0;
+    virtual void scalarDivide(long double) = 0;
 
-    virtual void &scalarDivide(std::complex<short>) = 0;
+    virtual void scalarDivide(std::complex<short>) = 0;
 
-    virtual void &scalarDivide(std::complex<int>) = 0;
+    virtual void scalarDivide(std::complex<int>) = 0;
 
-    virtual void &scalarDivide(std::complex<long>) = 0;
+    virtual void scalarDivide(std::complex<long>) = 0;
 
-    virtual void &scalarDivide(std::complex<long long>) = 0;
+    virtual void scalarDivide(std::complex<long long>) = 0;
 
-    virtual void &scalarDivide(std::complex<float>) = 0;
+    virtual void scalarDivide(std::complex<float>) = 0;
 
-    virtual void &scalarDivide(std::complex<double>) = 0;
+    virtual void scalarDivide(std::complex<double>) = 0;
 
-    virtual void &scalarDivide(std::complex<long double>) = 0;
+    virtual void scalarDivide(std::complex<long double>) = 0;
 
-    // virtual Matrix &dotProduct(const BasicMatrix &) = 0;
+     virtual void dotProduct(const BasicMatrix<T> &) = 0;
 
-    // virtual Matrix &dotProduct(const SparseMatrix &) = 0;
+     virtual void dotProduct(const SparseMatrix<T> &) = 0;
 
-    // virtual Matrix &crossProduct(const BasicMatrix &) = 0;
+     virtual void crossProduct(const BasicMatrix<T> &) = 0;
 
-    // virtual Matrix &crossProduct(const SparseMatrix &) = 0;
+     virtual void crossProduct(const SparseMatrix<T> &) = 0;
 
 //
 //    virtual Matrix &transpose() = 0;

@@ -13,10 +13,10 @@ struct Triple {
     T val;
 };
 
-template <typename >
+template<typename>
 class Matrix;
 
-template <typename >
+template<typename>
 class BasicMatrix;
 
 template<class T>
@@ -94,6 +94,13 @@ public:
 
     void scalarDivide(std::complex<long double>);
 
+    void dotProduct(const BasicMatrix<T> &);
+
+    void dotProduct(const SparseMatrix<T> &);
+
+    void crossProduct(const BasicMatrix<T> &);
+
+    void crossProduct(const SparseMatrix<T> &);
 };
 
 template<class T>
@@ -113,162 +120,150 @@ SparseMatrix<T>::SparseMatrix(std::vector<std::vector<T>>) {
 
 template<class T>
 void SparseMatrix<T>::add(const BasicMatrix<T> &) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::add(const SparseMatrix<T> &) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::subtract(const BasicMatrix<T> &) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::subtract(const SparseMatrix<T> &) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarMultiply(short) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarMultiply(int) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarMultiply(long) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarMultiply(long long int) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarMultiply(float) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarMultiply(double) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarMultiply(long double) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarMultiply(std::complex<short>) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarMultiply(std::complex<int>) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarMultiply(std::complex<long>) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarMultiply(std::complex<long long int>) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarMultiply(std::complex<float>) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarMultiply(std::complex<double>) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarMultiply(std::complex<long double>) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarDivide(short) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarDivide(int) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarDivide(long) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarDivide(long long int) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarDivide(float) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarDivide(double) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarDivide(long double) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarDivide(std::complex<short>) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarDivide(std::complex<int>) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarDivide(std::complex<long>) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarDivide(std::complex<long long int>) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarDivide(std::complex<float>) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarDivide(std::complex<double>) {
-    return (*this);
 }
 
 template<class T>
 void SparseMatrix<T>::scalarDivide(std::complex<long double>) {
-    return (*this);
+}
+
+template<class T>
+void SparseMatrix<T>::dotProduct(const BasicMatrix<T> &) {
+
+}
+
+template<class T>
+void SparseMatrix<T>::dotProduct(const SparseMatrix<T> &) {
+
+}
+
+template<class T>
+void SparseMatrix<T>::crossProduct(const BasicMatrix<T> &) {
+
+}
+
+template<class T>
+void SparseMatrix<T>::crossProduct(const SparseMatrix<T> &) {
+
 }
 
 #endif

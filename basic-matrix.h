@@ -88,12 +88,19 @@ public:
 
     void scalarDivide(std::complex<long double>);
 
+    void dotProduct(const BasicMatrix<T> &);
+
+    void dotProduct(const SparseMatrix<T> &);
+
+    void crossProduct(const BasicMatrix<T> &);
+
+    void crossProduct(const SparseMatrix<T> &);
 };
 
 template<class T>
 BasicMatrix<T>::BasicMatrix(int row, int col):Matrix<T>(row, col) {
     this->data = new T[row * col];
-    std::memset(data, 0, sizeof(T)*row*col);
+    std::memset(data, 0, sizeof(T) * row * col);
 }
 
 template<class T>
@@ -108,7 +115,7 @@ BasicMatrix<T>::BasicMatrix(std::vector<std::vector<T>> mat): Matrix<T>(mat.size
 
 template<class T>
 void BasicMatrix<T>::add(const BasicMatrix<T> &right) {
-    for (size_t i = 0;i < this->getSize();i++){
+    for (size_t i = 0; i < this->getSize(); i++) {
         this->data[i] = this->data[i] + right.data[i];
     }
 }
@@ -235,6 +242,26 @@ void BasicMatrix<T>::scalarDivide(std::complex<double>) {
 
 template<class T>
 void BasicMatrix<T>::scalarDivide(std::complex<long double>) {
+}
+
+template<class T>
+void BasicMatrix<T>::dotProduct(const BasicMatrix<T> &) {
+
+}
+
+template<class T>
+void BasicMatrix<T>::dotProduct(const SparseMatrix<T> &) {
+
+}
+
+template<class T>
+void BasicMatrix<T>::crossProduct(const BasicMatrix<T> &) {
+
+}
+
+template<class T>
+void BasicMatrix<T>::crossProduct(const SparseMatrix<T> &) {
+
 }
 
 #endif
