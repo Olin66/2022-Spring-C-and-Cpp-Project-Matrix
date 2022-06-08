@@ -6,6 +6,8 @@
 #include "matrix.h"
 #include "basic-matrix.h"
 
+namespace mat{
+
 template<typename T>
 struct Triple {
     long row;
@@ -421,6 +423,8 @@ Matrix<T> &SparseMatrix<T>::convolve(BasicMatrix<T> &) {
 
 template<class T>
 Matrix<T> &SparseMatrix<T>::convolve(SparseMatrix<T> &) {
+}
+
 }
 
 #endif

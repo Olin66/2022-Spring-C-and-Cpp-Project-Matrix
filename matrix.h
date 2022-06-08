@@ -8,6 +8,8 @@
 #include "basic-matrix.h"
 #include "sparse-matrix.h"
 
+namespace mat{
+
 template<class T>
 class Matrix {
 private:
@@ -176,5 +178,6 @@ public:
 
 };
 
+}
 
 #endif

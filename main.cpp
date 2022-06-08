@@ -4,6 +4,7 @@
 #include "basic-matrix.h"
 
 using namespace std;
+using namespace mat;
 
 int main() {
     Matrix<int> *m;

@@ -7,6 +7,8 @@
 #include "matrix.h"
 #include "sparse-matrix.h"
 
+namespace mat{
+
 template<typename>
 class Matrix;
 
@@ -419,6 +421,8 @@ Matrix<T> &BasicMatrix<T>::convolve(BasicMatrix<T> &) {
 
 template<class T>
 Matrix<T> &BasicMatrix<T>::convolve(SparseMatrix<T> &) {
+}
+
 }
 
 #endif
