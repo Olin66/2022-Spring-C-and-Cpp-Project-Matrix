@@ -27,4 +27,10 @@ int main() {
     v[0][0] = 3;
     BasicMatrix<int> qm(v);
     cout<<qm.getSize()<<endl;
+
+    try {
+        bm.add(rm);
+    }catch (ex::MismatchedSizeException& e){
+        cout<<e.what()<<endl;
+    }
 }

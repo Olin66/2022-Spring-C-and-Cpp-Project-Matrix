@@ -19,7 +19,7 @@ namespace mat {
             int l_row, l_col, r_row, r_col;
             std::string operation;
         public:
-            MismatchedSizeException(int l_row, int l_col, int r_row, int r_col, char *message) : l_row(l_row),
+            MismatchedSizeException(int l_row, int l_col, int r_row, int r_col, std::string message) : l_row(l_row),
                                                                                                      l_col(l_col),
                                                                                                      r_row(r_row),
                                                                                                      r_col(r_col),
