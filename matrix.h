@@ -176,6 +176,8 @@ namespace mat {
 
         virtual Matrix<T> &convolve(SparseMatrix<T> &) = 0;
 
+        virtual void exponent(int) = 0;
+
     };
 
 }

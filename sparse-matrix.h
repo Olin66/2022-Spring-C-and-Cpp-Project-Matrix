@@ -153,6 +153,8 @@ namespace mat {
         Matrix<T> &convolve(BasicMatrix<T> &);
 
         Matrix<T> &convolve(SparseMatrix<T> &);
+
+        void exponent(int exp);
     };
 
     template<class T>
@@ -421,6 +423,11 @@ namespace mat {
 
     template<class T>
     Matrix<T> &SparseMatrix<T>::convolve(SparseMatrix<T> &) {
+    }
+
+    template<class T>
+    void SparseMatrix<T>::exponent(int exp){
+        
     }
 
 }
