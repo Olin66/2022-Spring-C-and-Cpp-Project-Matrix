@@ -33,4 +33,12 @@ int main() {
     }catch (ex::MismatchedSizeException& e){
         cout<<e.what()<<endl;
     }
+
+    bm.add(qm);
+
+    for (int i = 0; i < bm.getSize(); i++)
+    {
+        // cout<<bm.getData()[i]<<endl;;
+    }
+    
 }

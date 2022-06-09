@@ -156,9 +156,7 @@ namespace mat {
     };
 
     template<class T>
-    SparseMatrix<T>::SparseMatrix(int row, int col) {
-
-    }
+    SparseMatrix<T>::SparseMatrix(int row, int col): Matrix<T>(row, col) {}
 
     // template<class T>
     // SparseMatrix<T>::SparseMatrix(const cv::Mat &mat) {
@@ -167,7 +165,7 @@ namespace mat {
 
     template<class T>
     SparseMatrix<T>::SparseMatrix(std::vector<std::vector<T>>) {
-
+        
     }
 
     template<class T>

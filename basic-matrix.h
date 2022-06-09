@@ -21,7 +21,9 @@ namespace mat {
     private:
         T *data;
     public:
-        BasicMatrix(int row, int col);
+        BasicMatrix(int , int );
+
+        BasicMatrix(int , int , T* );
 
         // BasicMatrix(const cv::Mat &mat);
 
@@ -149,12 +151,23 @@ namespace mat {
 
         Matrix<T> &convolve(SparseMatrix<T> &);
 
+        // T* getData(){
+        //     return this->data;
+        // }
+
     };
 
     template<class T>
     BasicMatrix<T>::BasicMatrix(int row, int col):Matrix<T>(row, col) {
-        this->data = new T[row * col];
-        std::memset(data, 0, sizeof(T) * row * col);
+        this->data = new T[this->getSize()];
+        std::memset(data, 0, sizeof(T) * this->getSize());
+    }
+
+    template<class T>
+    BasicMatrix<T>::BasicMatrix(int row, int col, T* _data):Matrix<T>(row, col){
+        this->data = new T[this->getSize()];
+        for (size_t i = 0; i < this->getSize(); i++)
+            this->data[i] = _data[i];
     }
 
     // template<class T>
@@ -164,12 +177,9 @@ namespace mat {
 
     template<class T>
     BasicMatrix<T>::BasicMatrix(std::vector<std::vector<T>> mat): Matrix<T>(mat.size(), mat[0].size()) {
+        this->data = new T[this->getSize()];
         for (size_t i = 0; i < this->getSize(); i++)
-        {
-            // this->data[i] = mat[i/this->col][i%this->col];
-        }
-        
-        
+            this->data[i] = mat[i/this->getCol()][i%this->getCol()];
     }
 
     template<class T>
@@ -406,7 +416,11 @@ namespace mat {
 
     template<class T>
     void BasicMatrix<T>::reshape(int row, int col) {
-
+        long _size = row * col;
+        if (this->size == _size) {
+            this->row = row;
+            this->col = col;
+        } else throw ex::MismatchedSizeException(this->row, this->col, row, col, "matrix reshaping");
     }
 
     template<class T>
