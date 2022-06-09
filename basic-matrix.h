@@ -23,7 +23,7 @@ namespace mat {
     public:
         BasicMatrix(int row, int col);
 
-        BasicMatrix(const cv::Mat &mat);
+        // BasicMatrix(const cv::Mat &mat);
 
         BasicMatrix(std::vector<std::vector<T>>);
 
@@ -157,14 +157,19 @@ namespace mat {
         std::memset(data, 0, sizeof(T) * row * col);
     }
 
-    template<class T>
-    BasicMatrix<T>::BasicMatrix(const cv::Mat &mat):Matrix<T>(mat) {
+    // template<class T>
+    // BasicMatrix<T>::BasicMatrix(const cv::Mat &mat):Matrix<T>(mat) {
 
-    }
+    // }
 
     template<class T>
     BasicMatrix<T>::BasicMatrix(std::vector<std::vector<T>> mat): Matrix<T>(mat.size(), mat[0].size()) {
-
+        for (size_t i = 0; i < this->getSize(); i++)
+        {
+            // this->data[i] = mat[i/this->col][i%this->col];
+        }
+        
+        
     }
 
     template<class T>

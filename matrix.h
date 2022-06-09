@@ -3,7 +3,7 @@
 
 #include <ccomplex>
 #include <cstring>
-#include <opencv2/opencv.hpp>
+// #include <opencv2/opencv.hpp>
 
 #include "basic-matrix.h"
 #include "sparse-matrix.h"
@@ -24,11 +24,11 @@ namespace mat {
             this->size = this->row * this->col;
         }
 
-        Matrix(const cv::Mat &mat) {
-            this->row = mat.rows;
-            this->col = mat.cols;
-            this->size = this->row * this->col;
-        }
+        // Matrix(const cv::Mat &mat) {
+        //     this->row = mat.rows;
+        //     this->col = mat.cols;
+        //     this->size = this->row * this->col;
+        // }
 
         void setSize(const long size) {
             this->size = size;
