@@ -1,6 +1,7 @@
 *.out
 settings.json
 .DS_Store
+.vscode
 
 *.c linguist-language=c
 *.html linguist-language=md

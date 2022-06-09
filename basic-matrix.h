@@ -21,9 +21,9 @@ namespace mat {
     private:
         T *data;
     public:
-        BasicMatrix(int , int );
+        BasicMatrix(int, int);
 
-        BasicMatrix(int , int , T* );
+        BasicMatrix(int, int, T *);
 
         // BasicMatrix(const cv::Mat &mat);
 
@@ -152,7 +152,21 @@ namespace mat {
         Matrix<T> &convolve(SparseMatrix<T> &);
 
         void exponent(int exp);
-        
+
+        BasicMatrix<T> operator+(const BasicMatrix<T> &);
+
+        BasicMatrix<T> operator+(const SparseMatrix<T> &);
+
+        BasicMatrix<T> operator-(const BasicMatrix<T> &);
+
+        BasicMatrix<T> operator-(const SparseMatrix<T> &);
+
+        template<typename P>
+        BasicMatrix<T> operator*(P);
+
+        T* getData(){
+            return this->data;
+        }
 
     };
 
@@ -163,7 +177,7 @@ namespace mat {
     }
 
     template<class T>
-    BasicMatrix<T>::BasicMatrix(int row, int col, T* _data):Matrix<T>(row, col){
+    BasicMatrix<T>::BasicMatrix(int row, int col, T *_data):Matrix<T>(row, col) {
         this->data = new T[this->getSize()];
         for (size_t i = 0; i < this->getSize(); i++)
             this->data[i] = _data[i];
@@ -178,13 +192,14 @@ namespace mat {
     BasicMatrix<T>::BasicMatrix(std::vector<std::vector<T>> mat): Matrix<T>(mat.size(), mat[0].size()) {
         this->data = new T[this->getSize()];
         for (size_t i = 0; i < this->getSize(); i++)
-            this->data[i] = mat[i/this->getCol()][i%this->getCol()];
+            this->data[i] = mat[i / this->getCol()][i % this->getCol()];
     }
 
     template<class T>
     void BasicMatrix<T>::add(const BasicMatrix<T> &right) {
         if (this->getRow() != right.getRow() || this->getCol() != right.getCol())
-            throw ex::MismatchedSizeException(this->getRow(), this->getCol(), right.getRow(), right.getCol(), "matrix addition");
+            throw ex::MismatchedSizeException(this->getRow(), this->getCol(), right.getRow(), right.getCol(),
+                                              "matrix addition");
         for (size_t i = 0; i < this->getSize(); i++) {
             this->data[i] = this->data[i] + right.data[i];
         }
@@ -416,10 +431,10 @@ namespace mat {
     template<class T>
     void BasicMatrix<T>::reshape(int row, int col) {
         long _size = row * col;
-        if (this->size == _size) {
-            this->row = row;
-            this->col = col;
-        } else throw ex::MismatchedSizeException(this->row, this->col, row, col, "matrix reshaping");
+        if (this->getSize() == _size) {
+            this->setRow(row);
+            this->setCol(col);
+        } else throw ex::MismatchedSizeException(this->getRow(), this->getCol(), row, col, "matrix reshaping");
     }
 
     template<class T>
@@ -446,10 +461,34 @@ namespace mat {
     }
 
     template<class T>
-    void BasicMatrix<T>::exponent(int exp){
+    void BasicMatrix<T>::exponent(int exp) {
 
     }
 
+    template<class T>
+    BasicMatrix<T> BasicMatrix<T>::operator+(const BasicMatrix<T> &) {
+        return BasicMatrix<T>(0, 0);
+    }
+
+    template<class T>
+    BasicMatrix<T> BasicMatrix<T>::operator+(const SparseMatrix<T> &) {
+        return BasicMatrix<T>(0, 0);
+    }
+
+    template<class T>
+    BasicMatrix<T> BasicMatrix<T>::operator-(const BasicMatrix<T> &) {
+        return BasicMatrix<T>(0, 0);
+    }
+
+    template<class T>
+    BasicMatrix<T> BasicMatrix<T>::operator-(const SparseMatrix<T> &) {
+        return BasicMatrix<T>(0, 0);
+    }
+
+    template<class T>
+    template<typename P>
+    BasicMatrix<T> BasicMatrix<T>::operator*(P){
+    }
 }
 
 #endif

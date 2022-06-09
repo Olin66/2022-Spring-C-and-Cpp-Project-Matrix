@@ -36,9 +36,13 @@ int main() {
 
     bm.add(qm);
 
+    BasicMatrix<int> mm = bm * 2;
+
+    // BasicMatrix<int> a = bm * qm;
+
     for (int i = 0; i < bm.getSize(); i++)
     {
-        // cout<<bm.getData()[i]<<endl;;
+        cout<<mm.getData()[i]<<endl;;
     }
     
 }
