@@ -26,11 +26,19 @@ namespace mat {
     private:
         std::vector<Triple<T>> triples;
     public:
-        SparseMatrix(int row, int col);
+        SparseMatrix(int, int);
 
         // SparseMatrix(const cv::Mat &mat);
 
         SparseMatrix(std::vector<std::vector<T>>);
+
+        SparseMatrix(int, int, T*);
+
+        SparseMatrix(int, int, std::vector<Triple<T>>);
+
+        SparseMatrix(const SparseMatrix<T> &);
+
+        SparseMatrix<T>& operator=(const SparseMatrix<T> &);
 
         void add(const BasicMatrix<T> &);
 
@@ -166,8 +174,48 @@ namespace mat {
     // }
 
     template<class T>
-    SparseMatrix<T>::SparseMatrix(std::vector<std::vector<T>>) {
+    SparseMatrix<T>::SparseMatrix(std::vector<std::vector<T>> mat): Matrix<T>(mat.size(), mat[0].size()) {
+        for (size_t i = 0; i < mat.size(); i++)
+        {
+            for (size_t j = 0; j < mat[i].size(); j++)
+            {
+                if (mat[i][j] != 0) {
+                    Triple<T> triple(i, j, mat[i][j]);
+                    triples.push_back(triple);
+                }
+            }
+            
+        }
         
+    }
+
+    template<class T>
+    SparseMatrix<T>::SparseMatrix(int row, int col, T* _data): Matrix<T>(row, col){
+        for (size_t i = 0; i < this->getSize(); i++)
+        {
+            if (_data[i] != 0) {
+                Triple<T> triple(i/this->getCol(), i%this->getCol(), _data[i]);
+                triples.push_back(triple);
+            }
+        }
+    }
+
+    template<class T>
+    SparseMatrix<T>::SparseMatrix(int row, int col, std::vector<Triple<T>> mat): Matrix<T>(row, col){
+        this->triples(mat);
+    }
+
+    template<class T>
+    SparseMatrix<T>::SparseMatrix(const SparseMatrix<T> & right): Matrix<T>(right.getRow(), right.getCol()){
+        this->triples(right.triples);
+    }
+
+    template<class T>
+    SparseMatrix<T>& SparseMatrix<T>::operator=(const SparseMatrix<T> & right){
+        this->setSize(right.getSize());
+        this->setRow(right.getRow());
+        this->setCol(right.getCol());
+        this->triples(right.triples);
     }
 
     template<class T>
