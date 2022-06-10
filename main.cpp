@@ -36,7 +36,7 @@ int main() {
 
     bm.add(qm);
 
-    BasicMatrix<int> mm = bm * 2;
+    BasicMatrix<int> mm(bm);
 
     // BasicMatrix<int> a = bm * qm;
 

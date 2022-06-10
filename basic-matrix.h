@@ -29,6 +29,10 @@ namespace mat {
 
         BasicMatrix(std::vector<std::vector<T>>);
 
+        BasicMatrix(const BasicMatrix<T> &);
+
+        BasicMatrix<T>& operator=(const BasicMatrix<T>&);
+
         void add(const BasicMatrix<T> &);
 
         void add(const SparseMatrix<T> &);
@@ -193,6 +197,26 @@ namespace mat {
         this->data = new T[this->getSize()];
         for (size_t i = 0; i < this->getSize(); i++)
             this->data[i] = mat[i / this->getCol()][i % this->getCol()];
+    }
+
+    template<class T>
+    BasicMatrix<T>::BasicMatrix(const BasicMatrix<T> & right): Matrix<T>(right.getRow(), right.getCol()) {
+        this->data = new T[this->getSize()];
+        for (size_t i = 0; i < this->getSize(); i++)
+            this->data[i] = right.data[i];
+    }
+
+    template<class T>
+    BasicMatrix<T>& BasicMatrix<T>::operator=(const BasicMatrix<T>& right){
+        if (this == &right) return (*this);
+        this->setRow(right.getRow());
+        this->setCol(right.getCol());
+        this->setSize(right.getSize());
+        delete [] data;
+        data = new T[this->getSize()];
+        for (size_t i = 0; i < this->getSize(); i++)
+            this->data[i] = right.data[i];
+        return (*this);
     }
 
     template<class T>
