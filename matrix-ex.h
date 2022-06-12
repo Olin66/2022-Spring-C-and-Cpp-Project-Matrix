@@ -3,6 +3,7 @@
 
 #include <exception>
 #include <string>
+#include "basic-matrix.h"
 
 namespace mat {
     namespace ex {
@@ -25,6 +26,15 @@ namespace mat {
                                                                                                      r_col(r_col),
                                                                                                      operation(
                                                                                                              message) {};
+            template<class T>                                                                                                 
+            MismatchedSizeException(const Matrix<T> &l_mat, const Matrix<T> &r_mat, std::string message): l_row(l_mat.getRow()), l_col(l_mat.getCol()), r_row(r_mat.getRow()), r_col(r_mat.getCol()) {}
+
+            template<class T>
+            MismatchedSizeException(const BasicMatrix<T> &l_mat, const BasicMatrix<T> &r_mat, std::string message) {
+                const Matrix<T>& l = l_mat;
+                const Matrix<T>& r = r_mat;
+                MismatchedSizeException(l, r, message);
+            }
 
             const char *what() override {
                 return (new std::string("The matrix exception occurs when doing " + operation + "\nThe sizes " +

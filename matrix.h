@@ -14,6 +14,7 @@ namespace mat {
     class Matrix {
     private:
         long size;
+    protected:
         int row;
         int col;
     public:
@@ -54,6 +55,10 @@ namespace mat {
             return this->col;
         }
 
+        virtual T getByIndex(int _row, int _col) const = 0;
+
+        virtual void setByIndex(int _row, int _col, T val) = 0;
+
         virtual void add(const BasicMatrix<T> &) = 0;
 
         virtual void add(const SparseMatrix<T> &) = 0;
@@ -62,61 +67,9 @@ namespace mat {
 
         virtual void subtract(const SparseMatrix<T> &) = 0;
 
-        virtual void scalarMultiply(short) = 0;
+        virtual void scalarMultiply(T) = 0;
 
-        virtual void scalarMultiply(int) = 0;
-
-        virtual void scalarMultiply(long) = 0;
-
-        virtual void scalarMultiply(long long) = 0;
-
-        virtual void scalarMultiply(float) = 0;
-
-        virtual void scalarMultiply(double) = 0;
-
-        virtual void scalarMultiply(long double) = 0;
-
-        virtual void scalarMultiply(std::complex<short>) = 0;
-
-        virtual void scalarMultiply(std::complex<int>) = 0;
-
-        virtual void scalarMultiply(std::complex<long>) = 0;
-
-        virtual void scalarMultiply(std::complex<long long>) = 0;
-
-        virtual void scalarMultiply(std::complex<float>) = 0;
-
-        virtual void scalarMultiply(std::complex<double>) = 0;
-
-        virtual void scalarMultiply(std::complex<long double>) = 0;
-
-        virtual void scalarDivide(short) = 0;
-
-        virtual void scalarDivide(int) = 0;
-
-        virtual void scalarDivide(long) = 0;
-
-        virtual void scalarDivide(long long) = 0;
-
-        virtual void scalarDivide(float) = 0;
-
-        virtual void scalarDivide(double) = 0;
-
-        virtual void scalarDivide(long double) = 0;
-
-        virtual void scalarDivide(std::complex<short>) = 0;
-
-        virtual void scalarDivide(std::complex<int>) = 0;
-
-        virtual void scalarDivide(std::complex<long>) = 0;
-
-        virtual void scalarDivide(std::complex<long long>) = 0;
-
-        virtual void scalarDivide(std::complex<float>) = 0;
-
-        virtual void scalarDivide(std::complex<double>) = 0;
-
-        virtual void scalarDivide(std::complex<long double>) = 0;
+        virtual void scalarDivide(T) = 0;
 
         virtual void dotProduct(const BasicMatrix<T> &) = 0;
 
@@ -178,6 +131,9 @@ namespace mat {
 
         virtual void exponent(int) = 0;
 
+        virtual void show() {
+            std::cout << "Base class Matrix" << std::endl;
+        }
     };
 
 }
