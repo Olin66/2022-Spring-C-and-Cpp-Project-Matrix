@@ -726,7 +726,15 @@ void BasicMatrix<T>::reshape(int row, int col) {
 
 template <class T>
 void BasicMatrix<T>::sliceRow(int row1, int row2) {
-}
+    if (row1 == row2) {
+        T* _new_data_ = new T[this->getCol()];
+        for (size_t i = 0; i < this->getCol(); i++)
+        {
+            /* code */
+        }
+        
+    }
+}   
 
 template <class T>
 void BasicMatrix<T>::sliceCol(int col1, int col2) {

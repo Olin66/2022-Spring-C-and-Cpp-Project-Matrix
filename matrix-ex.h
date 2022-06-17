@@ -3,8 +3,8 @@
 
 #include <exception>
 #include <string>
-#include "basic-matrix.h"
 #include "matrix.h"
+#include "basic-matrix.h"
 #include "sparse-matrix.h"
 
 namespace mat {
@@ -14,6 +14,13 @@ namespace mat {
             MatrixException() = default;
             virtual const char* what(){
                 return "Matrix Exception!";
+            }
+        };
+
+        class DuplicatedTripleException: public MatrixException{
+            public:
+            const char * what() override{
+                return (new std::string("The matrix exception occurs when creating SparseMatrix with duplicated triples!"))->c_str();
             }
         };
 
