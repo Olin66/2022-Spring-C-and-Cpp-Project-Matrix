@@ -3,6 +3,7 @@
 #include "matrix.h"
 #include "basic-matrix.h"
 #define BASIC_MATRIX_INT BasicMatrix<int>
+#define SPARSE_MATRIX_INT SparseMatrix<int>
 using namespace std;
 using namespace mat;
 

@@ -38,6 +38,13 @@ namespace mat {
                 MismatchedSizeException(l, r, message);
             }
 
+            template<class T>
+            MismatchedSizeException(const SparseMatrix<T> &l_mat, const SparseMatrix<T> &r_mat, std::string message) {
+                const Matrix<T>& l = l_mat;
+                const Matrix<T>& r = r_mat;
+                MismatchedSizeException(l, r, message);
+            }
+
             const char *what() override {
                 return (new std::string("The matrix exception occurs when doing " + operation + "\nThe sizes " +
                                         std::to_string(l_row) + "*" + std::to_string(l_col) + " and " +
