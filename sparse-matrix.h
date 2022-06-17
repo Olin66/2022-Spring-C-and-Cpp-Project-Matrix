@@ -1,10 +1,16 @@
 #ifndef SPARSE_MATRIX_H
 #define SPARSE_MATRIX_H
 
-#include <cstring>
-#include <vector>
+#include "matrix-ex.h"
 #include "matrix.h"
 #include "basic-matrix.h"
+#include <cstring>
+#include <iostream>
+#include <math.h>
+#include <string>
+#include <vector>
+#include <set>
+
 namespace mat {
     namespace ex {
         class MismatchedSizeException;
@@ -25,10 +31,10 @@ namespace mat {
     template<class T>
     class SparseMatrix : public Matrix<T> {
     private:
-        std::vector<Triple<T>> triples;
+        std::set<Triple<T>> triples;
 
         inline void addEle(Triple<T> tri) {
-            triples.push_back(tri);
+            triples.insert(tri);
         }
     public:
         SparseMatrix(int, int);
@@ -140,7 +146,7 @@ namespace mat {
             {
                 if (mat[i][j] != 0) {
                     Triple<T> triple(i, j, mat[i][j]);
-                    triples.push_back(triple);
+                    triples.insert(triple);
                 }
             }
             
@@ -154,14 +160,14 @@ namespace mat {
         {
             if (_data[i] != 0) {
                 Triple<T> triple(i/this->getCol(), i%this->getCol(), _data[i]);
-                triples.push_back(triple);
+                triples.insert(triple);
             }
         }
     }
 
     template<class T>
     SparseMatrix<T>::SparseMatrix(int row, int col, std::vector<Triple<T>> mat): Matrix<T>(row, col){
-        this->triples(mat);
+        
     }
 
     template<class T>
