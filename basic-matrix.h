@@ -8,6 +8,7 @@
 #include <math.h>
 #include <string>
 #include <vector>
+#include<complex>
 using namespace std;
 namespace mat {
 
@@ -93,13 +94,15 @@ class BasicMatrix : public Matrix<T> {
 
     bool getEigenvalue(int LoopNumber, double error, BasicMatrix<T> &result);
 
-    Matrix<T> &getEigenvector();
+    BasicMatrix<T> &getEigenvector(BasicMatrix<T>&eigenvector);
 
     T getTrace();
 
     T getDeterminant();
 
     void reshape(int row, int col);
+
+    void loop(T[]);
 
     void sliceRow(int row1, int row2);
 
@@ -325,7 +328,21 @@ void BasicMatrix<T>::inverse() { //用伴随矩阵求逆
 
 template <class T>
 void BasicMatrix<T>::conjugate() {
+    for (int i = 0; i < this->row; i++)
+    {
+        for (int j = 0; j < count; j++)
+        {
+            if(imag(this->getByIndex(i,j))!=0){
+                T temp=real(this->getByIndex(i,j))-imag(this->getByIndex(i,j));
+                this->setByIndex(i,j,temp);
+            }
+        }
+        
+    }
+    
 }
+
+
 template <class T>
 void BasicMatrix<T>::Hessenberg() { //求海森堡矩阵，上三角化
     BasicMatrix<T> A(this->row, this->col);
@@ -672,7 +689,40 @@ T BasicMatrix<T>::getColAvg(int col) {
 }
 
 template <class T>
-Matrix<T> &BasicMatrix<T>::getEigenvector() {
+BasicMatrix<T>& BasicMatrix<T>::getEigenvector(BasicMatrix<T> &eigenvector) {
+    T iterator[this->col];
+    for (int i = 0; i < this->col; i++)
+    {
+        iterator[i]=1;
+    }
+    
+   
+    T y=1.0;
+    T z;
+    
+    do
+    {
+        z=y;
+        this->loop(iterator);
+        T max=iterator[0];
+        for (int i = 0; i < this->col; i++)//求最大值
+        {
+            if(y<iterator[i])
+            max=iterator[i];
+        }
+            y=max;
+        for (int i = 0; i < this->col; i++)
+        {
+            eigenvector.setByIndex(i,0,iterator[i]/y);
+            iterator[i]=eigenvector.getByIndex(i,0);
+        }
+        
+        
+    
+        
+    } while (fabs(z-y)>=0.000001);
+    cout<<"y= "<<y<<endl;
+    return eigenvector;
 }
 
 template <class T>
@@ -726,15 +776,7 @@ void BasicMatrix<T>::reshape(int row, int col) {
 
 template <class T>
 void BasicMatrix<T>::sliceRow(int row1, int row2) {
-    if (row1 == row2) {
-        T* _new_data_ = new T[this->getCol()];
-        for (size_t i = 0; i < this->getCol(); i++)
-        {
-            /* code */
-        }
-        
-    }
-}   
+}
 
 template <class T>
 void BasicMatrix<T>::sliceCol(int col1, int col2) {
@@ -791,6 +833,24 @@ template <class T>
 template <typename P>
 BasicMatrix<T> BasicMatrix<T>::operator*(P) {
 }
+
+template <class T>
+void BasicMatrix<T>::loop(T iterator[]){
+    T S,U[this->col];//loopstart
+        for (int i = 0; i <this->col; i++)
+        {
+            U[i]=iterator[i];
+        }
+        for (int i = 0; i <this->col; i++)
+        {
+            S=0.0;
+            for (int j = 0; j < this->row ;j++)
+            {
+               S+=this->getByIndex(i,j)*U[j];
+            }
+            iterator[i]=S;
+        }//loop end;
+};
 } // namespace mat
 
 #endif
