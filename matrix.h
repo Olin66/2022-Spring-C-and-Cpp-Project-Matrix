@@ -83,6 +83,8 @@ namespace mat {
 
         virtual void inverse() = 0;
 
+        virtual void reverse() = 0;
+
         virtual void conjugate() = 0;
 
         virtual T getMax() = 0;
@@ -125,9 +127,9 @@ namespace mat {
 
         virtual void slice(int row1, int row2, int col1, int col2) = 0;
 
-        virtual Matrix<T> &convolve(BasicMatrix<T> &) = 0;
+        virtual Matrix<T> &convolve(BasicMatrix<T> &, int stride = 1, int padding = 0) = 0;
 
-        virtual Matrix<T> &convolve(SparseMatrix<T> &) = 0;
+        virtual Matrix<T> &convolve(SparseMatrix<T> &, int stride = 1, int padding = 0) = 0;
 
         virtual void exponent(int) = 0;
 

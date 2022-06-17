@@ -67,6 +67,8 @@ class BasicMatrix : public Matrix<T> {
 
     void inverse();
 
+    void reverse();
+
     void conjugate();
 
     void Hessenberg();
@@ -115,9 +117,9 @@ class BasicMatrix : public Matrix<T> {
 
     void slice(int row1, int row2, int col1, int col2);
 
-    Matrix<T> &convolve(BasicMatrix<T> &);
+    Matrix<T> &convolve(BasicMatrix<T> &, int stride = 1, int padding = 0);
 
-    Matrix<T> &convolve(SparseMatrix<T> &);
+    Matrix<T> &convolve(SparseMatrix<T> &, int stride = 1, int padding = 0);
 
     void exponent(int exp);
 
@@ -349,6 +351,15 @@ void BasicMatrix<T>::inverse() { //用伴随矩阵求逆
             }
         }
     
+}
+
+template<class T>
+void BasicMatrix<T>::reverse() {
+    T *r_data = new T[this->getSize()];
+    for (int i = 0; i < this->getSize(); i++)
+    r_data[i] = m_data[this->getSize() - i - 1];
+    delete [] m_data;
+    m_data = r_data;
 }
 
 template <class T>
@@ -775,12 +786,20 @@ void BasicMatrix<T>::slice(int row1, int row2, int col1, int col2) {
 }
 
 template <class T>
-Matrix<T> &BasicMatrix<T>::convolve(BasicMatrix<T> &) {
+Matrix<T> &BasicMatrix<T>::convolve(BasicMatrix<T> &right, int stride, int padding) {
+    if (right.row == right.col) {
+        throw ex::NotSquareException(right, "matrix convolve");
+    }
+    int r = (this->row - right.row + 2 * padding) / stride + 1;
+    int c = (this->col - right.col + 2 * padding) / stride + 1;
+    BasicMatrix<T> mat(r, c);
+    BasicMatrix<T> rev(right); rev.reverse();
 
+    // TODO:
 }
 
 template <class T>
-Matrix<T> &BasicMatrix<T>::convolve(SparseMatrix<T> &) {
+Matrix<T> &BasicMatrix<T>::convolve(SparseMatrix<T> &, int stride, int padding) {
 }
 
 template <class T>

@@ -92,6 +92,8 @@ namespace mat {
 
         void inverse();
 
+        void reverse();
+
         void conjugate();
 
         T getMax();
@@ -138,9 +140,9 @@ namespace mat {
 
         void slice(int row1, int row2, int col1, int col2);
 
-        Matrix<T> &convolve(BasicMatrix<T> &);
+        Matrix<T> &convolve(BasicMatrix<T> &, int stride = 1, int padding = 0);
 
-        Matrix<T> &convolve(SparseMatrix<T> &);
+        Matrix<T> &convolve(SparseMatrix<T> &, int stride = 1, int padding = 0);
 
         void exponent(int exp);
 
@@ -372,6 +374,11 @@ namespace mat {
     }
 
     template<class T>
+    void SparseMatrix<T>::reverse() {
+        
+    }
+
+    template<class T>
     void SparseMatrix<T>::conjugate() {
 
     }
@@ -554,11 +561,11 @@ namespace mat {
     }
 
     template<class T>
-    Matrix<T> &SparseMatrix<T>::convolve(BasicMatrix<T> &) {
+    Matrix<T> &SparseMatrix<T>::convolve(BasicMatrix<T> &, int stride, int padding) {
     }
 
     template<class T>
-    Matrix<T> &SparseMatrix<T>::convolve(SparseMatrix<T> &) {
+    Matrix<T> &SparseMatrix<T>::convolve(SparseMatrix<T> &, int stride, int padding) {
     }
 
     template<class T>
