@@ -91,7 +91,7 @@ class BasicMatrix : public Matrix<T> {
 
     T getColAvg(int);
 
-    bool getEigenvalue(int LoopNumber,double error,BasicMatrix<T>& result);
+    bool getEigenvalue(int LoopNumber, double error, BasicMatrix<T> &result);
 
     Matrix<T> &getEigenvector();
 
@@ -299,26 +299,28 @@ void BasicMatrix<T>::inverse() { //用伴随矩阵求逆
     BasicMatrix<T> temp(this->row - 1, this->col - 1);
     BasicMatrix<T> adjoint(this->row, this->col);
     if (this->col == 1) {
-        return;
+        return; //一阶矩阵逆是本身
     }
     for (int i = 0; i < this->col; i++) {
         for (int j = 0; j < this->col; j++) {
-            for (int k = 0; i < this->col - 1; k++) {
+            for (int k = 0; k < this->col - 1; k++) {
                 for (int l = 0; l < this->col - 1; l++) {
-                    temp.setByIndex(k, l,this->getByIndex(k >= i ? k + 1 : k, l >= j ? l + 1 : l)) ;
-                }
-                adjoint.setByIndex(j, i,temp.getDeterminant()) ; //进行了一次转置。
-                if ((i + j) % 2 == 1) {
-                    adjoint.setByIndex(j, i, -adjoint.getByIndex(j, i)); //将每一个元素的代数余子式加上正负号生成伴随矩阵
+                    temp.setByIndex(k, l, this->getByIndex(k >= i ? k + 1 : k, l >= j ? l + 1 : l));
                 }
             }
-        }
-        for (int i = 0; i < this->col; i++) {
-            for (int j = 0; i < this->row; i++) {
-                this->setByIndex(i, j, adjoint.getByIndex(i,j) / det);
+            adjoint.setByIndex(j, i, temp.getDeterminant()); //进行了一次转置。
+            if ((i + j) % 2 == 1) {
+                adjoint.setByIndex(j, i, -adjoint.getByIndex(j, i)); //将每一个元素的代数余子式加上正负号生成伴随矩阵
+                adjoint.show();
             }
         }
     }
+        for (int i = 0; i < this->col; i++) {
+            for (int j = 0; j < this->row; j++) {
+                this->setByIndex(i, j, adjoint.getByIndex(i, j) / det);
+            }
+        }
+    
 }
 
 template <class T>
@@ -338,7 +340,7 @@ void BasicMatrix<T>::Hessenberg() { //求海森堡矩阵，上三角化
             A.setByIndex(i, j, this->getByIndex(i, j));
         }
     }
-    for (k = 1; k < this->col- 1; k++) {
+    for (k = 1; k < this->col - 1; k++) {
         i = k - 1;
         Max = k;
         temp = abs(A.getByIndex(k, i));
@@ -377,22 +379,18 @@ void BasicMatrix<T>::Hessenberg() { //求海森堡矩阵，上三角化
             }
         }
     }
-    for ( i = 0; i < this->col; i++)
-    {
-        
-        for (j = 0; j < this->col; j++)
-        {
-            this->setByIndex(i,j,A.getByIndex(i,j));
+    for (i = 0; i < this->col; i++) {
+
+        for (j = 0; j < this->col; j++) {
+            this->setByIndex(i, j, A.getByIndex(i, j));
         }
-        
     }
-    
 }
 template <class T>
 T BasicMatrix<T>::getMax() {
     T max = getByIndex(0, 0);
     for (int i = 0; i < this->row; i++) {
-        for (int j = 0; j < this->col; i++) {
+        for (int j = 0; j < this->col; j++) {
             T temp = getByIndex(i, j);
             if (max < temp) {
                 max = temp;
@@ -406,7 +404,7 @@ template <class T>
 T BasicMatrix<T>::getMin() {
     T min = getByIndex(0, 0);
     for (int i = 0; i < this->row; i++) {
-        for (int j = 0; j < this->col; i++) {
+        for (int j = 0; j < this->col; j++) {
             T temp = getByIndex(i, j);
             if (min > temp) {
                 min = temp;
@@ -420,7 +418,7 @@ template <class T>
 T BasicMatrix<T>::getSum() {
     T sum = 0;
     for (int i = 0; i < this->row; i++) {
-        for (int j = 0; j < this->col; i++) {
+        for (int j = 0; j < this->col; j++) {
             sum += getByIndex(i, j);
         }
     }
@@ -434,9 +432,9 @@ T BasicMatrix<T>::getAvg() {
 }
 
 template <class T>
-bool BasicMatrix<T>::getEigenvalue(int LoopNumber,double error,BasicMatrix<T>&result) {
-    if(this->col!=this->row){
-        throw ex::NotSquareException(this->row,this->col,"eigen value");
+bool BasicMatrix<T>::getEigenvalue(int LoopNumber, double error, BasicMatrix<T> &result) {
+    if (this->col != this->row) {
+        throw ex::NotSquareException(this->row, this->col, "eigen value");
     }
     int i;
     int j;
@@ -460,178 +458,142 @@ bool BasicMatrix<T>::getEigenvalue(int LoopNumber,double error,BasicMatrix<T>&re
     T y;
     T temp;
     this->Hessenberg();
-    BasicMatrix<T>A(*this);
-    BasicMatrix<T>B(2,this->col);
-    result=B;
-    m=this->getCol();
-    loop=LoopNumber;
-    while (m)
-    {
-        t=m-1;
-        while(t>0){
-            temp=abs(A.getByIndex(t-1,t-1));
-            temp+=temp*error;
-            if(abs(A.getByIndex(t,t-1))>temp){
+    BasicMatrix<T> A(*this);
+    BasicMatrix<T> B(2, this->col);
+    result = B;
+    m = this->getCol();
+    loop = LoopNumber;
+    while (m) {
+        t = m - 1;
+        while (t > 0) {
+            temp = abs(A.getByIndex(t - 1, t - 1));
+            temp += temp * error;
+            if (abs(A.getByIndex(t, t - 1)) > temp) {
                 t--;
-            }
-            else{
+            } else {
                 break;
             }
         }
-        if(t==m-1)
-        {
-            result.setByIndex(m-1,0,A.getByIndex(m-1,m-1));
-            result.setByIndex(m-1,1,0);
-            m-=1;
-            loop=LoopNumber;
-        }else if(t==m-2){
-            b=-A.getByIndex(m-1,m-1)-A.getByIndex(m-2,m-2);
-            c=A.getByIndex(m-1,m-1)*A.getByIndex(m-2,m-2)-A.getByIndex(m-1,m-2)*A.getByIndex(m-2,m-1);
-            d=b*b-4*c;
-            y=sqrt(abs(d));
-            if (d>0)
-            {
-                xy=1;
-                if (b<0)
-                {
-                    xy=-1;
+        if (t == m - 1) {
+            result.setByIndex(m - 1, 0, A.getByIndex(m - 1, m - 1));
+            result.setByIndex(m - 1, 1, 0);
+            m -= 1;
+            loop = LoopNumber;
+        } else if (t == m - 2) {
+            b = -A.getByIndex(m - 1, m - 1) - A.getByIndex(m - 2, m - 2);
+            c = A.getByIndex(m - 1, m - 1) * A.getByIndex(m - 2, m - 2) - A.getByIndex(m - 1, m - 2) * A.getByIndex(m - 2, m - 1);
+            d = b * b - 4 * c;
+            y = sqrt(abs(d));
+            if (d > 0) {
+                xy = 1;
+                if (b < 0) {
+                    xy = -1;
                 }
-                result.setByIndex(m-1,0,-(b+xy*y)/2);
-                result.setByIndex(m-1,1,0);
-                result.setByIndex(m-2,0,c/result.getByIndex(m-1,0));
-                result.setByIndex(m-2,1,0);
-                
-            }
-            else{
-                result.setByIndex(m-1,0,-b/2);
-                result.setByIndex(m-2,0,-b/2);
-                result.setByIndex(m-1,1,y/2);
-                result.setByIndex(m-2,1,-y/2);
+                result.setByIndex(m - 1, 0, -(b + xy * y) / 2);
+                result.setByIndex(m - 1, 1, 0);
+                result.setByIndex(m - 2, 0, c / result.getByIndex(m - 1, 0));
+                result.setByIndex(m - 2, 1, 0);
 
+            } else {
+                result.setByIndex(m - 1, 0, -b / 2);
+                result.setByIndex(m - 2, 0, -b / 2);
+                result.setByIndex(m - 1, 1, y / 2);
+                result.setByIndex(m - 2, 1, -y / 2);
             }
-            m-=2;
-            loop=LoopNumber;
-            
-        }
-        else{
-            if(loop<1){
-                cout<<"no eigenvalue"<<endl;
+            m -= 2;
+            loop = LoopNumber;
+
+        } else {
+            if (loop < 1) {
+                cout << "no eigenvalue" << endl;
                 return false;
             }
             loop--;
-            j=t+2;
-            while (j<m)
-            {
-                A.setByIndex(j,j-2,0);
+            j = t + 2;
+            while (j < m) {
+                A.setByIndex(j, j - 2, 0);
                 j++;
             }
-            j=t+3;
-            while (j<m)
-            {
-                A.setByIndex(j,j-3,0);
+            j = t + 3;
+            while (j < m) {
+                A.setByIndex(j, j - 3, 0);
                 j++;
             }
-            k=t;
-            while (k<m-1)
-            {
-                if (k!=t)
-                {
-                    p=A.getByIndex(k,k-1);
-                    q=A.getByIndex(k+1,k-1);
-                    if (k!=m-2)
-                    {
-                        r=A.getByIndex(k+2,k-1);
-                    }else{
-                        r=0;
+            k = t;
+            while (k < m - 1) {
+                if (k != t) {
+                    p = A.getByIndex(k, k - 1);
+                    q = A.getByIndex(k + 1, k - 1);
+                    if (k != m - 2) {
+                        r = A.getByIndex(k + 2, k - 1);
+                    } else {
+                        r = 0;
                     }
-                    
-                }else{
-                    b=A.getByIndex(m-1,m-1);
-                    c=A.getByIndex(m-2,m-2);
-                    x=b+c;
-                    y=b*c-A.getByIndex(m-2,m-1)*A.getByIndex(m-1,m-2);
-                    p=A.getByIndex(t,t)*(A.getByIndex(t,t)-x)+A.getByIndex(t,t+1)*A.getByIndex(t+1,t)+y;
-                    q=A.getByIndex(t+1,t)*(A.getByIndex(t,t)+A.getByIndex(t+1,t+1)-x);
-                    r=A.getByIndex(t+1,t)*A.getByIndex(t+2,t+1);
+
+                } else {
+                    b = A.getByIndex(m - 1, m - 1);
+                    c = A.getByIndex(m - 2, m - 2);
+                    x = b + c;
+                    y = b * c - A.getByIndex(m - 2, m - 1) * A.getByIndex(m - 1, m - 2);
+                    p = A.getByIndex(t, t) * (A.getByIndex(t, t) - x) + A.getByIndex(t, t + 1) * A.getByIndex(t + 1, t) + y;
+                    q = A.getByIndex(t + 1, t) * (A.getByIndex(t, t) + A.getByIndex(t + 1, t + 1) - x);
+                    r = A.getByIndex(t + 1, t) * A.getByIndex(t + 2, t + 1);
                 }
-                if (p!=0||q!=0||r!=0)
-                {
-                    if (q<0)
-                    {
-                        xy=-1;
+                if (p != 0 || q != 0 || r != 0) {
+                    if (q < 0) {
+                        xy = -1;
+                    } else {
+                        xy = 1;
                     }
-                    else
-                    {
-                       xy=1;
+                    s = xy * sqrt(p * p + q * q + r * r);
+                    if (k != t) {
+                        A.setByIndex(k, k - 1, -s);
                     }
-                    s=xy*sqrt(p*p+q*q+r*r);
-                    if (k!=t)
-                    {
-                       A.setByIndex(k,k-1,-s);
-                    }
-                    e=-q/s;
-                    f=-r/s;
-                    x=-p/s;
-                    y=-x-f*r/(p+s);
-                    g=e*r/(p+s);
-                    z=-x-e*q/(p+s);
-                    for (j = k; j < m; j++)
-                    {
-                        b=A.getByIndex(k,j);
-                        c=A.getByIndex(k+1,j);
-                        p=x*b+e*c;
-                        q=e*b+y*c;
-                        r=f*b+g*c;
-                        if (k!=m-2)
-                        {
-                            b=A.getByIndex(k+2,j);
-                            p+=f*b;
-                            q+=g*b;
-                            r+=z*b;
-                            A.setByIndex(k+2,j,r);
+                    e = -q / s;
+                    f = -r / s;
+                    x = -p / s;
+                    y = -x - f * r / (p + s);
+                    g = e * r / (p + s);
+                    z = -x - e * q / (p + s);
+                    for (j = k; j < m; j++) {
+                        b = A.getByIndex(k, j);
+                        c = A.getByIndex(k + 1, j);
+                        p = x * b + e * c;
+                        q = e * b + y * c;
+                        r = f * b + g * c;
+                        if (k != m - 2) {
+                            b = A.getByIndex(k + 2, j);
+                            p += f * b;
+                            q += g * b;
+                            r += z * b;
+                            A.setByIndex(k + 2, j, r);
                         }
-                        A.setByIndex(k+1,j,q);
-                        A.setByIndex(k,j,p);
-                        
+                        A.setByIndex(k + 1, j, q);
+                        A.setByIndex(k, j, p);
                     }
-                    j=k+3;
-                    if (j>m-2)
-                    {
-                        j=m-1;
+                    j = k + 3;
+                    if (j > m - 2) {
+                        j = m - 1;
                     }
-                    for ( i = t; i < j+1; i++)
-                    {
-                        b=A.getByIndex(i,k);
-                        c=A.getByIndex(i,k+1);
-                        p=x*b+e*c;
-                        q=e*b+y*c;
-                        r=f*b+g*c;
-                        if (k!=m-2)
-                        {
-                            b=A.getByIndex(i,k+2);
-                            p+=f*b;
-                            q+=g*b;
-                            z+=z*b;
-                            A.setByIndex(i,k+2,r);
+                    for (i = t; i < j + 1; i++) {
+                        b = A.getByIndex(i, k);
+                        c = A.getByIndex(i, k + 1);
+                        p = x * b + e * c;
+                        q = e * b + y * c;
+                        r = f * b + g * c;
+                        if (k != m - 2) {
+                            b = A.getByIndex(i, k + 2);
+                            p += f * b;
+                            q += g * b;
+                            z += z * b;
+                            A.setByIndex(i, k + 2, r);
                         }
-                        A.setByIndex(i,k+1,q);
-                        A.setByIndex(i,k,p);
-                        
+                        A.setByIndex(i, k + 1, q);
+                        A.setByIndex(i, k, p);
                     }
-                    
-                    
-                    
-                    
-                    
-                    
                 }
                 k++;
-                
-                
             }
-            
-            
-            
         }
     }
     return true;
