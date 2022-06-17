@@ -311,7 +311,7 @@ void BasicMatrix<T>::inverse() { //用伴随矩阵求逆
             adjoint.setByIndex(j, i, temp.getDeterminant()); //进行了一次转置。
             if ((i + j) % 2 == 1) {
                 adjoint.setByIndex(j, i, -adjoint.getByIndex(j, i)); //将每一个元素的代数余子式加上正负号生成伴随矩阵
-                adjoint.show();
+            
             }
         }
     }
@@ -335,8 +335,8 @@ void BasicMatrix<T>::Hessenberg() { //求海森堡矩阵，上三角化
     int Max;
     double temp;
     for (i = 0; i < this->col; i++) {
-        k = i * this->col;
-        for (j = 0; i < this->col; j++) {
+        
+        for (j = 0; j < this->col; j++) {
             A.setByIndex(i, j, this->getByIndex(i, j));
         }
     }
@@ -459,7 +459,7 @@ bool BasicMatrix<T>::getEigenvalue(int LoopNumber, double error, BasicMatrix<T> 
     T temp;
     this->Hessenberg();
     BasicMatrix<T> A(*this);
-    BasicMatrix<T> B(2, this->col);
+    BasicMatrix<T> B(this->row, 2);
     result = B;
     m = this->getCol();
     loop = LoopNumber;
