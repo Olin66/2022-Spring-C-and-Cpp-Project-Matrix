@@ -746,6 +746,7 @@ void BasicMatrix<T>::slice(int row1, int row2, int col1, int col2) {
 
 template <class T>
 Matrix<T> &BasicMatrix<T>::convolve(BasicMatrix<T> &) {
+    
 }
 
 template <class T>
