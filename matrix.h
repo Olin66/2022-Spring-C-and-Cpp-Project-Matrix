@@ -43,7 +43,7 @@ namespace mat {
             this->col = col;
         }
 
-        int getSize() const{
+        long getSize() const{
             return this->size;
         }
 
