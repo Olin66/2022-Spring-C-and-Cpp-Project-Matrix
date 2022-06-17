@@ -210,7 +210,7 @@ void BasicMatrix<T>::add(const SparseMatrix<T> & right) {
     {
         auto tri = *it;
         T point = getByIndex(tri._row, tri._col) + tri.val;
-        setByIndex(tri._row, tri._col, T);
+        setByIndex(tri._row, tri._col, point);
     }
 }
 
@@ -231,7 +231,7 @@ void BasicMatrix<T>::subtract(const SparseMatrix<T> & right) {
     {
         auto tri = *it;
         T point = getByIndex(tri._row, tri._col) - tri.val;
-        setByIndex(tri._row, tri._col, T);
+        setByIndex(tri._row, tri._col, point);
     }
 }
 
@@ -239,7 +239,7 @@ template <class T>
 void BasicMatrix<T>::scalarMultiply(T val) {
     for (size_t i = 0; i < this->getSize(); i++)
     {
-        this->m_data[i] = this->m_data[i] * T;
+        this->m_data[i] = this->m_data[i] * val;
     }
 }
 
@@ -247,7 +247,7 @@ template <class T>
 void BasicMatrix<T>::scalarDivide(T val) {
     for (size_t i = 0; i < this->getSize(); i++)
     {
-        this->m_data[i] = this->m_data[i] / T;
+        this->m_data[i] = this->m_data[i] / val;
     }
 }
 
@@ -776,7 +776,7 @@ void BasicMatrix<T>::slice(int row1, int row2, int col1, int col2) {
 
 template <class T>
 Matrix<T> &BasicMatrix<T>::convolve(BasicMatrix<T> &) {
-    
+
 }
 
 template <class T>
