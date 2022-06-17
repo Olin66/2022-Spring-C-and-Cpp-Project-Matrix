@@ -11,6 +11,14 @@
 using namespace std;
 namespace mat {
 
+    namespace ex {
+        class MatrixException;
+        class MismatchedSizeException;
+        class DuplicatedTripleException;
+        class NotSquareException;
+        class NoInverseException;
+    }
+
 template <typename>
 class Matrix;
 
@@ -189,7 +197,7 @@ void BasicMatrix<T>::setByIndex(int _row, int _col, T val) {
 template <class T>
 void BasicMatrix<T>::add(const BasicMatrix<T> &right) {
     if (this->getRow() != right.getRow() || this->getCol() != right.getCol())
-        throw ex::MismatchedSizeException(this->getRow(), this->getCol(), right.getRow(), right.getCol(),
+        throw ex::MismatchedSizeException(*this, right,
                                           "matrix addition");
     for (size_t i = 0; i < this->getSize(); i++) {
         this->m_data[i] = this->m_data[i] + right.m_data[i];
@@ -197,30 +205,50 @@ void BasicMatrix<T>::add(const BasicMatrix<T> &right) {
 }
 
 template <class T>
-void BasicMatrix<T>::add(const SparseMatrix<T> &) {
+void BasicMatrix<T>::add(const SparseMatrix<T> & right) {
+    for (auto it = right.getTriples().begin();it != right.getTriples().end();it++)
+    {
+        auto tri = *it;
+        T point = getByIndex(tri._row, tri._col) + tri.val;
+        setByIndex(tri._row, tri._col, T);
+    }
 }
 
 template <class T>
 void BasicMatrix<T>::subtract(const BasicMatrix<T> &right) {
     if (this->getRow() != right.getRow() || this->getCol() != right.getCol()) {
-        throw ex::MismatchedSizeException(this->getRow(), this->getCol(), right.getRow(), right.getCol(),
+        throw ex::MismatchedSizeException(*this, right,
                                           "matrix subtract");
     }
-    for (int i = 0; i < this->getSize(); i++) {
+    for (size_t i = 0; i < this->getSize(); i++) {
         this->m_data[i] = this->m_data[i] - right.m_data[i];
     }
 }
 
 template <class T>
-void BasicMatrix<T>::subtract(const SparseMatrix<T> &) {
+void BasicMatrix<T>::subtract(const SparseMatrix<T> & right) {
+    for (auto it = right.getTriples().begin();it != right.getTriples().end();it++)
+    {
+        auto tri = *it;
+        T point = getByIndex(tri._row, tri._col) - tri.val;
+        setByIndex(tri._row, tri._col, T);
+    }
 }
 
 template <class T>
-void BasicMatrix<T>::scalarMultiply(T) {
+void BasicMatrix<T>::scalarMultiply(T val) {
+    for (size_t i = 0; i < this->getSize(); i++)
+    {
+        this->m_data[i] = this->m_data[i] * T;
+    }
 }
 
 template <class T>
-void BasicMatrix<T>::scalarDivide(T) {
+void BasicMatrix<T>::scalarDivide(T val) {
+    for (size_t i = 0; i < this->getSize(); i++)
+    {
+        this->m_data[i] = this->m_data[i] / T;
+    }
 }
 
 template <class T>
@@ -325,7 +353,9 @@ void BasicMatrix<T>::inverse() { //用伴随矩阵求逆
 
 template <class T>
 void BasicMatrix<T>::conjugate() {
+    
 }
+
 template <class T>
 void BasicMatrix<T>::Hessenberg() { //求海森堡矩阵，上三角化
     BasicMatrix<T> A(this->row, this->col);

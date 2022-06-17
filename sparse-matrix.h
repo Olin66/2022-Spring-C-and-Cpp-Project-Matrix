@@ -13,14 +13,25 @@
 
 namespace mat {
     namespace ex {
+        class MatrixException;
         class MismatchedSizeException;
         class DuplicatedTripleException;
+        class NotSquareException;
+        class NoInverseException;
     }
     template<typename T>
     struct Triple {
         long _row;
         long _col;
         T val;
+
+        bool operator==(const Triple<T> & right){
+            if (this->_row == right._row && this->_col == right._col) {
+                return true;
+            }else {
+                return false;
+            }
+        }
     };
 
     template<typename>
@@ -32,6 +43,7 @@ namespace mat {
     template<class T>
     class SparseMatrix : public Matrix<T> {
     private:
+        long size;
         std::set<Triple<T>> triples;
 
         inline void addEle(Triple<T> tri) {
@@ -131,6 +143,10 @@ namespace mat {
         Matrix<T> &convolve(SparseMatrix<T> &);
 
         void exponent(int exp);
+
+        std::set<Triple<T>> getTriples() const{
+            return this->triples;
+        }
     };
 
     template<class T>
