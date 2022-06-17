@@ -247,7 +247,18 @@ namespace mat {
     }
 
     template<class T>
-    void SparseMatrix<T>::add(const SparseMatrix<T> &) {
+    void SparseMatrix<T>::add(const SparseMatrix<T> &right) {
+        SparseMatrix<T> mat(this->row, this->col);
+        for (int i = 0; i < this->triples.size(); i++) {
+            for (int j = 0; j < right.triples.size(); j++) {
+                Triple<T> LP = triples[i];
+                Triple<T> RP = triples[j];
+                if (LP._row == RP._row && LP._row == RP._row) {
+                    mat.setByIndex(LP._row, LP._col, LP.val + RP.val);
+                }
+            }
+        }
+        *this = mat;
     }
 
     template<class T>
@@ -255,19 +266,32 @@ namespace mat {
     }
 
     template<class T>
-    void SparseMatrix<T>::subtract(const SparseMatrix<T> &) {
+    void SparseMatrix<T>::subtract(const SparseMatrix<T> &right) {
+        SparseMatrix<T> mat(this->row, this->col);
+        for (int i = 0; i < this->triples.size(); i++) {
+            for (int j = 0; j < right.triples.size(); j++) {
+                Triple<T> LP = triples[i];
+                Triple<T> RP = triples[j];
+                if (LP._row == RP._row && LP._row == RP._row) {
+                    mat.setByIndex(LP._row, LP._col, LP.val - RP.val);
+                }
+            }
+        }
+        *this = mat;
     }
 
     template<class T>
-    void SparseMatrix<T>::scalarMultiply(T) {
+    void SparseMatrix<T>::scalarMultiply(T x) {
+        for (int i = 0; i < this->triples.size(); i++) {
+            this->triples[i] *= x;
+        }
     }
 
     template<class T>
-    void SparseMatrix<T>::scalarDivide(T) {
-    }
-
-    template<class T>
-    void SparseMatrix<T>::scalarDivide(std::complex<long double>) {
+    void SparseMatrix<T>::scalarDivide(T x) {
+        for (int i = 0; i < this->triples.size(); i++) {
+            this->triples[i] /= x;
+        }
     }
 
     template<class T>
