@@ -12,7 +12,10 @@
 #include <set>
 
 namespace mat {
-    
+    namespace ex {
+        class MismatchedSizeException;
+        class DuplicatedTripleException;
+    }
     template<typename T>
     struct Triple {
         long _row;
@@ -30,6 +33,10 @@ namespace mat {
     class SparseMatrix : public Matrix<T> {
     private:
         std::set<Triple<T>> triples;
+
+        inline void addEle(Triple<T> tri) {
+            triples.insert(tri);
+        }
     public:
         SparseMatrix(int, int);
 
@@ -188,37 +195,36 @@ namespace mat {
         this->setCol(right.getCol());
         this->triples(right.triples);
     }
-    template <class T>
-T SparseMatrix<T>::getByIndex(int _row, int _col) const {
-    T target=0;
-    for (int i = 0; i < this->triples.size(); i++)
-    {
-        if (this->triples[i]._col==_col &&this->triples[i]._row==_row)
-        {
-            return target=this->triples[i].val;
-        }
-        
-    }
-    
-    
-    
-    return target;
-}
 
-template <class T>
-void SparseMatrix<T>::setByIndex(int _row, int _col, T val) {
-    for (int i = 0; i < this->triples.size(); i++)
-    {
-        if (this->triples[i]._row==_row&&this->triples[i]._col==_col)
+    template <class T>
+    T SparseMatrix<T>::getByIndex(int _row, int _col) const {
+        T target=0;
+        for (int i = 0; i < this->triples.size(); i++)
         {
-            this->triples[i].val=val;
-            return;
+            if (this->triples[i]._col==_col &&this->triples[i]._row==_row)
+            {
+                return target=this->triples[i].val;
+            }
+            
         }
+        return target;
     }
-    Triple<T>triple(_row,_col,val);
-    this->triples.push_back(triple);
-    return;
-}
+
+    template <class T>
+    void SparseMatrix<T>::setByIndex(int _row, int _col, T val) {
+        for (int i = 0; i < this->triples.size(); i++)
+        {
+            if (this->triples[i]._row==_row&&this->triples[i]._col==_col)
+            {
+                this->triples[i].val=val;
+                return;
+            }
+        }
+        Triple<T>triple(_row,_col,val);
+        this->addEle(triple);
+        return;
+    }
+
     template<class T>
     void SparseMatrix<T>::add(const BasicMatrix<T> &) {
     }
@@ -253,8 +259,41 @@ void SparseMatrix<T>::setByIndex(int _row, int _col, T val) {
     }
 
     template<class T>
-    void SparseMatrix<T>::dotProduct(const SparseMatrix<T> &) {
+    void SparseMatrix<T>::dotProduct(const SparseMatrix<T> &right) {
+        if (this->row != right.row) {
+            throw ex::MismatchedSizeException(*this, right, "matrix dot product");
+        } else if (this->col != 1 && this->col != right.col) {
+            throw ex::MismatchedSizeException(*this, right, "matrix dot product");
+        }
 
+        int r = right.row;
+        int c = right.col;
+        if (this->col == 1) {
+            SparseMatrix<T> mat(r, 1);
+            for (int i = 0; i < this->triples.size(); i++) {
+                for (int j = 0; j < right.triples.size(); j++) {
+                    mat::Triple<T>& l_point = this->triples[i];
+                    mat::Triple<T>& r_point = right.triples[j];
+                    if (l_point._row == r_point._row) {
+                        mat.setByIndex(r_point._row, r_point._col, l_point.val * r_point.val);
+                    }
+                }
+            }
+            *this = mat;
+        } else {
+            SparseMatrix<T> mat(r, c);
+            for (int i = 0; i < this->triples.size(); i++) {
+                for (int j = 0;j  < right.triples.size(); j++) {
+                    mat::Triple<T>& l_point = this->triples[i];
+                    mat::Triple<T>& r_point = right.triples[i];
+                    if (l_point._row == r_point._row &&
+                        l_point._col == r_point._col) {
+                            mat.setByIndex(r_point._row, r_point._col, l_point.val * r_point.val);
+                        }
+                }
+            }
+            *this = mat;
+        }
     }
 
     template<class T>
@@ -263,8 +302,23 @@ void SparseMatrix<T>::setByIndex(int _row, int _col, T val) {
     }
 
     template<class T>
-    void SparseMatrix<T>::crossProduct(const SparseMatrix<T> &) {
-
+    void SparseMatrix<T>::crossProduct(const SparseMatrix<T> &right) {
+        if (this->col != right.col) {
+            throw ex::MismatchedSizeException(*this, right, "matrix cross product");
+        }
+        int r = this->row;
+        int c = right.col;
+        SparseMatrix<T> mat(r, c);
+        for (int i = 0; i < this->triples.size(); i++) {
+            Triple<T>& l_point = this->triples[i];
+            for (int j = 0; j < right.triples.size(); j++) {
+                Triple<T>& r_point = right.triples[j];
+                if (l_point._col == r_point._row) {
+                    mat.setByIndex(l_point._row, r_point._col, mat.getByIndex(l_point._row, r_point._col) + l_point.val * r_point.val);
+                }
+            }
+        }
+        *this = mat;
     }
 
     template<class T>
@@ -294,9 +348,6 @@ void SparseMatrix<T>::setByIndex(int _row, int _col, T val) {
             
         }
         return max;
-        
-        
-        
     }
 
     template<class T>
