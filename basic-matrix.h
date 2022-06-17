@@ -759,13 +759,13 @@ void BasicMatrix<T>::sliceRow(int row1, int row2) {
         T* _new_data_ = new T[this->getCol()];
         for (size_t i = 0; i < this->getCol(); i++)
         {
-            /* code */
+            
         }
         
     }else if (row1 < row2){
 
     } else{
-        throw ex::InvalidSizeException("slicing the row", 2)
+        throw ex::InvalidSizeException("slicing the row", 2, row1, row2);
     }
 }   
 

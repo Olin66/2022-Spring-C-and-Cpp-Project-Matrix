@@ -34,9 +34,9 @@ namespace mat {
                         return (new std::string("The matrix exception occurs when "+ message +" with invalid row " 
                         + std::to_string(i1) + " column " + std::to_string(i2)))->c_str();
                     case 2:
-                        return (new std::string("The matrix exception occurs when "+message+" with invalid row " + to_string(i1) + " and "+ to_string(i2)))->c_str();
+                        return (new std::string("The matrix exception occurs when "+message+" with invalid row " + std::to_string(i1) + " and "+ std::to_string(i2)))->c_str();
                         case 3: 
-                            return (new std::string("The maxtrix exception occurs when " + message + "with invalid column " + to_string(i1) + " and "+ to_string(i2)))->c_str();
+                            return (new std::string("The maxtrix exception occurs when " + message + "with invalid column " + std::to_string(i1) + " and "+ std::to_string(i2)))->c_str();
                     default:
                         break;
                     }
