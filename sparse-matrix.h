@@ -18,6 +18,7 @@ namespace mat {
         class DuplicatedTripleException;
         class NotSquareException;
         class NoInverseException;
+        class InvalidSizeException;
     }
     template<typename T>
     struct Triple {
@@ -542,7 +543,15 @@ namespace mat {
 
     template<class T>
     void SparseMatrix<T>::reshape(int row, int col) {
-
+        long _size = row * col;
+    if (this->getSize() == _size) {
+        this->setRow(col);
+        this->setCol(row);
+        
+        
+    } else
+        throw ex::MismatchedSizeException(this->getRow(), this->getCol(), row, col, "matrix reshaping");
+        
     }
 
     template<class T>

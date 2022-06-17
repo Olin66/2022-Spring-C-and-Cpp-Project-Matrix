@@ -10,13 +10,13 @@
 #include <vector>
 using namespace std;
 namespace mat {
-
-    namespace ex {
+ namespace ex {
         class MatrixException;
         class MismatchedSizeException;
         class DuplicatedTripleException;
         class NotSquareException;
         class NoInverseException;
+        class InvalidSizeException;
     }
 
 template <typename>
@@ -364,7 +364,7 @@ void BasicMatrix<T>::reverse() {
 
 template <class T>
 void BasicMatrix<T>::conjugate() {
-    
+
 }
 
 template <class T>
@@ -391,7 +391,6 @@ void BasicMatrix<T>::Hessenberg() { //求海森堡矩阵，上三角化
                 Max = j;
             }
         }
-
 
         this->setByIndex(0, 0, A.getByIndex(Max, i));
         i = Max;
@@ -759,30 +758,89 @@ template <class T>
 void BasicMatrix<T>::reshape(int row, int col) {
     long _size = row * col;
     if (this->getSize() == _size) {
-        this->setRow(row);
-        this->setCol(col);
+        this->setRow(col);
+        this->setCol(row);
     } else
         throw ex::MismatchedSizeException(this->getRow(), this->getCol(), row, col, "matrix reshaping");
 }
 
 template <class T>
 void BasicMatrix<T>::sliceRow(int row1, int row2) {
+    T* _new_data_;
     if (row1 == row2) {
-        T* _new_data_ = new T[this->getCol()];
+        this->setRow(1);
+        this->setSize(this->getCol());
+        _new_data_ = new T[this->getCol()];
+        int start_index = row1 * this->getCol();
         for (size_t i = 0; i < this->getCol(); i++)
         {
-            /* code */
+            _new_data_[i] = this->getData()[start_index++];
         }
-        
+    }else if (row1 < row2){
+        long temp = this->getCol() * (row2-row1+1);
+        this->setRow(row2-row1+1);
+        this->setSize(temp);
+        _new_data_ = new T[temp];
+        int start_index = row1 * this->getCol();
+        for (size_t i = 0; i < temp; i++)
+        {
+            _new_data_[i] = this->getData()[start_index++];
+        }
+    } else{
+        throw ex::InvalidSizeException("slicing the row", 2, row1, row2);
     }
+    delete[] this->m_data;
+    this->m_data = _new_data_;
 }   
 
 template <class T>
 void BasicMatrix<T>::sliceCol(int col1, int col2) {
+    T* _new_data_;
+    if (col1 == col2){
+        this->setCol(1);
+        this->setSize(this->getRow());
+        _new_data_ = new T[this->getRow()];
+        for (size_t i = 0; i < this->getRow(); i++)
+        {
+            _new_data_[i] = col1 + i * this->getCol();
+        }
+    }else if (col1 < col2){
+        long temp = this->getRow() * (col2-col1+1);
+        _new_data_ = new T[temp];
+        long k = 0;
+        for (size_t i = 0; i < this->getRow(); i++)
+        {
+            for (size_t j = col1; j <= col2; j++)
+            {
+                _new_data_[k++] = this->m_data[j + i *this-> getCol()];
+            }
+        }
+        this->setCol(col2-col1+1);
+        this->setSize(temp);
+    } else{
+        throw ex::InvalidSizeException("slicing the column", 3, col1, col2);
+    }
+    delete[] this->m_data;
+    this->m_data = _new_data_;
 }
 
 template <class T>
 void BasicMatrix<T>::slice(int row1, int row2, int col1, int col2) {
+    if (row1 > row2) throw ex::InvalidSizeException("slicing the row", 2, row1, row2);
+    if (col1 > col2) throw ex::InvalidSizeException("slicing the column", 3, col1, col2);
+    long temp = (row2-row1+1) * (col2-col1+1);
+    T* _new_data_ = new T[temp];
+    long k = 0;
+    for (size_t i = row1;i <= row2; i++)
+    {
+        for (size_t j = col1; j <= col2; j++)
+        {
+            _new_data_[k++] = this->m_data[j + i * this->getCol()];
+        }
+    }
+    this->setRow(row2-row1+1);
+    this->setCol(col2-col1+1);
+    this->setSize(temp);
 }
 
 template <class T>
