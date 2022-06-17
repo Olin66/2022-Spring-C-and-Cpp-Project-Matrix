@@ -10,6 +10,15 @@
 
 namespace mat {
 
+ namespace ex {
+        class MatrixException;
+        class MismatchedSizeException;
+        class DuplicatedTripleException;
+        class NotSquareException;
+        class NoInverseException;
+        class InvalidSizeException;
+    }
+
     template<class T>
     class Matrix {
     private:
@@ -20,6 +29,9 @@ namespace mat {
     public:
 
         Matrix(int row, int col) {
+            if (row <= 0 || col <= 0) {
+                throw ex::InvalidSizeException("creating Matrix", 1, row, col);
+            }
             this->row = row;
             this->col = col;
             this->size = this->row * this->col;

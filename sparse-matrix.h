@@ -18,6 +18,7 @@ namespace mat {
         class DuplicatedTripleException;
         class NotSquareException;
         class NoInverseException;
+        class InvalidSizeException;
     }
     template<typename T>
     struct Triple {

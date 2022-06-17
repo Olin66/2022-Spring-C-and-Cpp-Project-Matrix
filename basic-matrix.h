@@ -10,13 +10,13 @@
 #include <vector>
 using namespace std;
 namespace mat {
-
-    namespace ex {
+ namespace ex {
         class MatrixException;
         class MismatchedSizeException;
         class DuplicatedTripleException;
         class NotSquareException;
         class NoInverseException;
+        class InvalidSizeException;
     }
 
 template <typename>
@@ -210,7 +210,7 @@ void BasicMatrix<T>::add(const SparseMatrix<T> & right) {
     {
         auto tri = *it;
         T point = getByIndex(tri._row, tri._col) + tri.val;
-        setByIndex(tri._row, tri._col, T);
+        setByIndex(tri._row, tri._col, point);
     }
 }
 
@@ -231,7 +231,7 @@ void BasicMatrix<T>::subtract(const SparseMatrix<T> & right) {
     {
         auto tri = *it;
         T point = getByIndex(tri._row, tri._col) - tri.val;
-        setByIndex(tri._row, tri._col, T);
+        setByIndex(tri._row, tri._col, point);
     }
 }
 
@@ -239,7 +239,7 @@ template <class T>
 void BasicMatrix<T>::scalarMultiply(T val) {
     for (size_t i = 0; i < this->getSize(); i++)
     {
-        this->m_data[i] = this->m_data[i] * T;
+        this->m_data[i] = this->m_data[i] * val;
     }
 }
 
@@ -247,7 +247,7 @@ template <class T>
 void BasicMatrix<T>::scalarDivide(T val) {
     for (size_t i = 0; i < this->getSize(); i++)
     {
-        this->m_data[i] = this->m_data[i] / T;
+        this->m_data[i] = this->m_data[i] / val;
     }
 }
 
@@ -353,7 +353,7 @@ void BasicMatrix<T>::inverse() { //用伴随矩阵求逆
 
 template <class T>
 void BasicMatrix<T>::conjugate() {
-    
+
 }
 
 template <class T>
@@ -380,7 +380,6 @@ void BasicMatrix<T>::Hessenberg() { //求海森堡矩阵，上三角化
                 Max = j;
             }
         }
-
 
         this->setByIndex(0, 0, A.getByIndex(Max, i));
         i = Max;
@@ -763,6 +762,10 @@ void BasicMatrix<T>::sliceRow(int row1, int row2) {
             /* code */
         }
         
+    }else if (row1 < row2){
+
+    } else{
+        throw ex::InvalidSizeException("slicing the row", 2)
     }
 }   
 

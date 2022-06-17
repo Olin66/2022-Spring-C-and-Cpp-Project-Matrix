@@ -17,6 +17,32 @@ namespace mat {
             }
         };
 
+        class InvalidSizeException: public MatrixException{
+            private:
+            int choice;
+            int i1, i2;
+            std::string message;
+            public:
+                InvalidSizeException() = default;
+
+                InvalidSizeException(std::string m, int ch, int i1, int i2): message(m), choice(ch), i1(i1), i2(i2) {};
+
+                const char * what() override{
+                    switch (choice)
+                    {
+                    case 1:
+                        return (new std::string("The matrix exception occurs when "+ message +" with invalid row " 
+                        + std::to_string(i1) + " column " + std::to_string(i2)))->c_str();
+                    case 2:
+                        return (new std::string("The matrix exception occurs when "+message+" with invalid row " + to_string(i1) + " and "+ to_string(i2)))->c_str();
+                        case 3: 
+                            return (new std::string("The maxtrix exception occurs when " + message + "with invalid column " + to_string(i1) + " and "+ to_string(i2)))->c_str();
+                    default:
+                        break;
+                    }
+                }
+        };
+
         class DuplicatedTripleException: public MatrixException{
             public:
             const char * what() override{
