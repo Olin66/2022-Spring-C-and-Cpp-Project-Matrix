@@ -96,6 +96,10 @@ namespace mat {
 
         Matrix<T> &getEigenvector();
 
+        T getByIndex(int _row, int _col) const;
+
+        void setByIndex(int _row, int _col, T val);
+
         T getTrace();
 
         T getDeterminant();
@@ -167,7 +171,38 @@ namespace mat {
         this->setCol(right.getCol());
         this->triples(right.triples);
     }
+    template <class T>
+T SparseMatrix<T>::getByIndex(int _row, int _col) const {
+    T target=0;
+    for (int i = 0; i < this->triples.size(); i++)
+    {
+        if (this->triples[i]._col==_col &&this->triples[i]._row==_row)
+        {
+            return target=this->triples[i].val;
+        }
+        
+    }
+    
+    
+    
+    return target;
+}
 
+template <class T>
+void SparseMatrix<T>::setByIndex(int _row, int _col, T val) {
+    for (int i = 0; i < this->triples.size(); i++)
+    {
+        if (this->triples[i]._row==_row&&this->triples[i]._col==_col)
+        {
+            this->triples[i].val=val;
+            return;
+        }
+    }
+    Triple<T>triple(_row,_col,val);
+    this->triple.pushback();
+    return;
+    
+}
     template<class T>
     void SparseMatrix<T>::add(const BasicMatrix<T> &) {
     }
@@ -233,50 +268,146 @@ namespace mat {
 
     template<class T>
     T SparseMatrix<T>::getMax() {
+        T max=0;
+        for (int i = 0;i< this->triples.size(); i++)
+        {
+            if (max<this->triples[i].val)
+            {
+                max=this->triples[i].val;
+            }
+            
+        }
+        return max;
+        
+        
+        
     }
 
     template<class T>
     T SparseMatrix<T>::getMin() {
+        T min=0;
+        for (int i = 0; i < this->triples.size(); i++)
+        {
+            if (min>this->triples[i].val)
+            {
+                min=this->triples[i].val;
+            }
+            
+        }
+        return min;
+        
+        
     }
 
     template<class T>
     T SparseMatrix<T>::getSum() {
+        T sum=0;
+        for (int i = 0; i < this->triples.size(); i++)
+        {
+            sum+=this->triples[i].val;
+        }
+        return sum;
+        
     }
 
     template<class T>
     T SparseMatrix<T>::getAvg() {
+        return this->getSum/(this->col*this->row);
     }
 
     template<class T>
-    T SparseMatrix<T>::getRowMax(int) {
+    T SparseMatrix<T>::getRowMax(int row) {
+        T max=0;
+        for (int i = 0; i < this->triples.size(); i++)
+        {
+            if (max<this->triples[i].val&&this->triples[i]._row==row)
+            {
+                max=this->triples[i].val;
+            }
+            
+        }
+        return max;
     }
 
     template<class T>
-    T SparseMatrix<T>::getColMax(int) {
+    T SparseMatrix<T>::getColMax(int col) {
+        T max=0;
+        for (int i = 0; i < this->triples.size(); i++)
+        {
+            if (max<this->triples[i].val&&this->triples[i]._col==col)
+            {
+                max=this->triples[i].val;
+            }
+            
+        }
+        return max;
     }
 
     template<class T>
-    T SparseMatrix<T>::getRowMin(int) {
+    T SparseMatrix<T>::getRowMin(int row) {
+        T min=0;
+        for (int i = 0; i < this->triples.size(); i++)
+        {
+            if (min>this->triples[i].val&&this->triples[i]._row==row)
+            {
+                min=this->triples[i].val;
+            }
+            
+        }
+        return min;
+
     }
 
     template<class T>
-    T SparseMatrix<T>::getColMin(int) {
+    T SparseMatrix<T>::getColMin(int col) {
+         T min=0;
+        for (int i = 0; i < this->triples.size(); i++)
+        {
+            if (min>this->triples[i].val&&this->triples[i]._col==col)
+            {
+                min=this->triples[i].val;
+            }
+            
+        }
+        return min;
     }
 
     template<class T>
-    T SparseMatrix<T>::getRowSum(int) {
+    T SparseMatrix<T>::getRowSum(int row) {
+        T sum=0;
+        for (int i = 0; i < this->triples.size(); i++)
+        {
+            if (this->triples[i]._row==row)
+            {
+                sum+=this->triples[i].val;
+            }
+            
+        }
+        return sum;
     }
 
     template<class T>
-    T SparseMatrix<T>::getColSum(int) {
+    T SparseMatrix<T>::getColSum(int col) {
+        T sum=0;
+        for (int i = 0; i < this->triples.size(); i++)
+        {
+            if (this->triples[i]._col==col)
+            {
+                sum+=this->triples[i].val;
+            }
+            
+        }
+        return sum;
     }
 
     template<class T>
-    T SparseMatrix<T>::getRowAvg(int) {
+    T SparseMatrix<T>::getRowAvg(int row) {
+        return this->getRowSum(row)/this->col;
     }
 
     template<class T>
-    T SparseMatrix<T>::getColAvg(int) {
+    T SparseMatrix<T>::getColAvg(int col) {
+        return this->getColSum(col)/this->row;
     }
 
     template<class T>
