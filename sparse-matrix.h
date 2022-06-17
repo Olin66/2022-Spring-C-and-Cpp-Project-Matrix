@@ -1,9 +1,9 @@
 #ifndef SPARSE_MATRIX_H
 #define SPARSE_MATRIX_H
 
-#include "matrix-ex.h"
 #include "matrix.h"
 #include "basic-matrix.h"
+#include "matrix-ex.h"
 #include <cstring>
 #include <iostream>
 #include <math.h>
@@ -12,7 +12,7 @@
 #include <set>
 
 namespace mat {
-
+    
     template<typename T>
     struct Triple {
         long _row;
@@ -40,6 +40,8 @@ namespace mat {
         SparseMatrix(int, int, T*);
 
         SparseMatrix(int, int, std::vector<Triple<T>>);
+
+        SparseMatrix(int, int, std::set<Triple<T>>);
 
         SparseMatrix(const SparseMatrix<T> &);
 
@@ -161,7 +163,17 @@ namespace mat {
 
     template<class T>
     SparseMatrix<T>::SparseMatrix(int row, int col, std::vector<Triple<T>> mat): Matrix<T>(row, col){
-        
+        std::set<Triple<T>> temp(mat.begin(), mat.end());
+        if (mat.size() != temp.size()) {
+            throw ex::DuplicatedTripleException();
+        }
+        mat.assign(temp.begin(), temp.end());
+        this->triples(mat);
+    }
+
+    template<class T>
+    SparseMatrix<T>::SparseMatrix(int row, int col, std::set<Triple<T>> mat): Matrix<T>(row, col){
+        this->triples(mat);
     }
 
     template<class T>
