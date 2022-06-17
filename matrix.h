@@ -109,7 +109,7 @@ namespace mat {
 
         virtual T getColAvg(int) = 0;
 
-        virtual T getEigenvalue() = 0;
+        virtual bool getEigenvalue(int LoopNumber,double error,BasicMatrix<T>& result) = 0;
 
         virtual Matrix<T> &getEigenvector() = 0;
 

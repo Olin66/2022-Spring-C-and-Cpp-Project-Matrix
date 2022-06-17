@@ -91,7 +91,7 @@ class BasicMatrix : public Matrix<T> {
 
     T getColAvg(int);
 
-    T getEigenvalue(int LoopNumber,double error,BasicMatrix<T>& result);
+    bool getEigenvalue(int LoopNumber,double error,BasicMatrix<T>& result);
 
     Matrix<T> &getEigenvector();
 
@@ -296,8 +296,8 @@ void BasicMatrix<T>::inverse() { //用伴随矩阵求逆
     {
         throw ex::NoInverseException(*this, "matrix inverse");
     }
-    Matrix<T> temp(this->row - 1, this->col - 1);
-    Matrix<T> adjoint(this->row, this->col);
+    BasicMatrix<T> temp(this->row - 1, this->col - 1);
+    BasicMatrix<T> adjoint(this->row, this->col);
     if (this->col == 1) {
         return;
     }
@@ -305,17 +305,17 @@ void BasicMatrix<T>::inverse() { //用伴随矩阵求逆
         for (int j = 0; j < this->col; j++) {
             for (int k = 0; i < this->col - 1; k++) {
                 for (int l = 0; l < this->col - 1; l++) {
-                    temp.setByIndex(k, l) = this->getByIndex(k >= i ? k + 1 : k, l >= j ? l + 1 : l);
+                    temp.setByIndex(k, l,this->getByIndex(k >= i ? k + 1 : k, l >= j ? l + 1 : l)) ;
                 }
-                adjoint.setByIndex(j, i) = temp.getDeterminant(); //进行了一次转置。
+                adjoint.setByIndex(j, i,temp.getDeterminant()) ; //进行了一次转置。
                 if ((i + j) % 2 == 1) {
                     adjoint.setByIndex(j, i, -adjoint.getByIndex(j, i)); //将每一个元素的代数余子式加上正负号生成伴随矩阵
                 }
             }
         }
-        for (int i = 0; i < this.col; i++) {
+        for (int i = 0; i < this->col; i++) {
             for (int j = 0; i < this->row; i++) {
-                this->setByIndex(i, j, adjoint.getAvg(i, j) / det);
+                this->setByIndex(i, j, adjoint.getByIndex(i,j) / det);
             }
         }
     }
@@ -413,7 +413,7 @@ T BasicMatrix<T>::getMin() {
             }
         }
     }
-    return max;
+    return min;
 }
 
 template <class T>
@@ -430,11 +430,11 @@ T BasicMatrix<T>::getSum() {
 template <class T>
 T BasicMatrix<T>::getAvg() {
     int sum = getSum();
-    return sum / this->size;
+    return sum / this->getSize();
 }
 
 template <class T>
-T BasicMatrix<T>::getEigenvalue(int LoopNumber,double error,BasicMatrix<T>&result) {
+bool BasicMatrix<T>::getEigenvalue(int LoopNumber,double error,BasicMatrix<T>&result) {
     if(this->col!=this->row){
         throw ex::NotSquareException(this->row,this->col,"eigen value");
     }
@@ -459,8 +459,10 @@ T BasicMatrix<T>::getEigenvalue(int LoopNumber,double error,BasicMatrix<T>&resul
     T z;
     T y;
     T temp;
-    BasicMatrix<T>A(this->Hessenberg());
-    result(2,this->col);
+    this->Hessenberg();
+    BasicMatrix<T>A(*this);
+    BasicMatrix<T>B(2,this->col);
+    result=B;
     m=this->getCol();
     loop=LoopNumber;
     while (m)
@@ -514,7 +516,7 @@ T BasicMatrix<T>::getEigenvalue(int LoopNumber,double error,BasicMatrix<T>&resul
         else{
             if(loop<1){
                 cout<<"no eigenvalue"<<endl;
-                return;
+                return false;
             }
             loop--;
             j=t+2;
@@ -632,7 +634,7 @@ T BasicMatrix<T>::getEigenvalue(int LoopNumber,double error,BasicMatrix<T>&resul
             
         }
     }
-    
+    return true;
 }
 
 template <class T>
@@ -665,7 +667,7 @@ T BasicMatrix<T>::getRowMax(int row) {
             max = this->getByIndex(row, i);
         }
     }
-    return min;
+    return max;
 }
 
 template <class T>
@@ -676,7 +678,7 @@ T BasicMatrix<T>::getColMax(int col) {
             max = this->getByIndex(i, col);
         }
     }
-    return min;
+    return max;
 }
 
 template <class T>
@@ -717,7 +719,7 @@ T BasicMatrix<T>::getTrace() {
         throw ex::NotSquareException(*this, "matrix trace");
     }
     T trace = 0;
-    for (int i = 0; i < this.col; i++) {
+    for (int i = 0; i < this->col; i++) {
         trace += getByIndex(i, i);
     }
     return trace;
@@ -735,7 +737,7 @@ T BasicMatrix<T>::getDeterminant() {
         det = this->getByIndex(0, 0) * getByIndex(1, 1) - getByIndex(0, 1) * getByIndex(1, 0); //一阶二阶直接计算
     } else {
         for (int k = 0; k < this->col; k++) {
-            Matrix<T> M(this->row - 1, this->col - 1); //为代数余子式申请内存
+            BasicMatrix<T> M(this->row - 1, this->col - 1); //为代数余子式申请内存
             for (int i = 0; i < this->col - 1; i++) {
                 for (int j = 0; j < this->col - 1; j++) {
                     M.setByIndex(i, j, this->getByIndex(i + 1, j < k ? j : j + 1)); //为代数余子式赋值
@@ -743,7 +745,7 @@ T BasicMatrix<T>::getDeterminant() {
             }
             if (this->getByIndex(0, k) != 0) //如果是零可以直接不继续算
             {
-                det += this->getByIndex(0, k) * M.getDeterminant() * (((2 + k) % 2) = 1 ? -1 : 1); //从一第行展开，采用递归算法计算行列式
+                det += this->getByIndex(0, k) * M.getDeterminant() * (((2 + k) % 2) == 1 ? -1 : 1); //从一第行展开，采用递归算法计算行列式
             }
         }
     }
