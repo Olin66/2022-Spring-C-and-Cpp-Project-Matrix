@@ -9,6 +9,7 @@
 #include <math.h>
 #include <string>
 #include <vector>
+#include <set>
 #include <map>
 
 namespace mat {
@@ -19,6 +20,7 @@ namespace mat {
         class NotSquareException;
         class NoInverseException;
         class InvalidSizeException;
+        class InvalidTripleException;
     }
     template<typename T>
     struct Triple {
@@ -28,12 +30,16 @@ namespace mat {
 
         Triple(int _row, int _col, T val): _row(_row), _col(_col), val(val) {}
 
-        bool operator==(const Triple<T> & right){
-            if (this->_row == right._row && this->_col == right._col) {
-                return true;
-            }else {
-                return false;
+         bool operator <(const Triple<T> & tri) const
+            {
+                if (this->_row == tri._row && this->_col == tri._col) return false;
+                else return true;
             }
+
+        Triple(const Triple<T> & right){
+            this->_row = right._row;
+            this->_col = right._col;
+            this->val = right.val;
         }
     };
 
@@ -162,49 +168,75 @@ namespace mat {
 
     template<class T>
     SparseMatrix<T>::SparseMatrix(std::vector<std::vector<T>> mat): Matrix<T>(mat.size(), mat[0].size()) {
-        // FIXME:
-        // for (size_t i = 0; i < mat.size(); i++)
-        // {
-        //     for (size_t j = 0; j < mat[i].size(); j++)
-        //     {
-        //         if (mat[i][j] != 0) {
-        //             Triple<T> triple(i, j, mat[i][j]);
-        //             tri_map.insert(triple);
-        //         }
-        //     }
-            
-        // }
+        for (size_t i = 0; i < mat.size(); i++)
+        {
+            for (size_t j = 0; j < mat[i].size(); j++)
+            {
+                if (mat[i][j] != 0) {
+                    setByIndex(i, j, mat[i][j]);
+                }
+            }
+        }
     }
 
     template<class T>
     SparseMatrix<T>::SparseMatrix(int row, int col, T* _data): Matrix<T>(row, col){
-        // for (size_t i = 0; i < this->getSize(); i++)
-        // {
-        //     if (_data[i] != 0) {
-        //         Triple<T> triple(i/this->getCol(), i%this->getCol(), _data[i]);
-        //         tri_map.insert(triple);
-        //     }
-        // }
+        for (size_t i = 0; i < this->getSize(); i++)
+        {
+            if (_data[i] != 0) {
+                setByIndex(i/this->getCol(), i%this->getCol(), _data[i]);
+            }
+        }
     }
 
     template<class T>
     SparseMatrix<T>::SparseMatrix(int row, int col, std::vector<Triple<T>> mat): Matrix<T>(row, col){
-        // std::set<Triple<T>> temp(mat.begin(), mat.end());
-        // if (mat.size() != temp.size()) {
-        //     throw ex::DuplicatedTripleException();
-        // }
-        //mat.assign(temp.begin(), temp.end());
-        //this->tri_map(mat);
+        std::set<Triple<T>> temp(mat.begin(), mat.end());
+        if (mat.size() != temp.size()) {
+            throw ex::DuplicatedTripleException();
+        }
+        for (size_t i = 0;i < mat.size();i++)
+        {
+            Triple<T>* t = new Triple<T>(mat[i]);
+            long index = t->_row * this->getCol() + t->_col;
+            if (index >= this->getSize() || t->_row < 0 || t->_row >= row || t->_col < 0 || t->_col >= col)
+                {
+                    for (auto it = this->tri_map.begin();it != this->tri_map.end();it++)
+                {
+                    if (it->second != nullptr) delete it->second;
+                }
+                    throw ex::InvalidTripleException(t->_row, t->_col);}
+            tri_map[index] = t;
+        }
     }
 
     template<class T>
     SparseMatrix<T>::SparseMatrix(int row, int col, std::map<int , Triple<T>*> _map): Matrix<T>(row, col){
-        this->tri_map = _map;
+        for (auto it = _map.begin();it != _map.end();it++)
+        {
+            Triple<T> temp = it;
+            Triple<T>* t = new Triple<T>(temp->_row, temp->_col, temp->val);
+            long index = t->_row * this->getCol() + t->_col;
+            if (index >= this->getSize() || t->_row < 0 || t->_row >= row || t->_col < 0 || t->_col >= col)
+               { 
+                for (auto it = this->tri_map.begin();it != this->tri_map.end();it++)
+                {
+                    if (it->second != nullptr) delete it->second;
+                }
+                
+                throw ex::InvalidTripleException(t->_row, t->_col);
+            }
+        }
+        
     }
 
     template<class T>
     SparseMatrix<T>::SparseMatrix(const SparseMatrix<T> & right): Matrix<T>(right.getRow(), right.getCol()){
-        this->tri_map(right.tri_map);
+        for (auto it = right.tri_map.begin();it != right.tri_map.end();it++)
+        {
+            auto tri = it->second;
+            this->setByIndex(tri->_row, tri->_col, tri->val);
+        }
     }
 
     template<class T>
@@ -212,8 +244,16 @@ namespace mat {
         this->setSize(right.getSize());
         this->setRow(right.getRow());
         this->setCol(right.getCol());
-        //this->tri_map(right.tri_map);
-        // TODO:
+        for (auto it = this->tri_map.begin(); it != tri_map.end();it++)
+        {
+            if (it->second != nullptr) delete it->second;
+        }
+        this->tri_map.clear();
+        for (auto it = right.tri_map.begin(); it != right.tri_map.end();it++)
+        {
+            auto tri = it->second;
+            this->setByIndex(tri->_row, tri->_col, tri->val);
+        }
     }
 
     template <class T>
@@ -227,10 +267,10 @@ namespace mat {
 
     template <class T>
     void SparseMatrix<T>::setByIndex(int _row, int _col, T val) {
-        int index = _row * this->col + _col;
+        long index = _row * this->col + _col;
         if (tri_map[index] == nullptr) {
-            Triple<T> t(_row, _col, val);
-            tri_map[index] = &t;
+            Triple<T>* t = new Triple<T>(_row, _col, val);
+            tri_map[index] = t;
         } else {
             tri_map[index]->val = val;
         }
@@ -583,9 +623,12 @@ namespace mat {
         using namespace std;
         T mat[this->getRow()][this->getCol()];
         memset(mat, 0, sizeof(mat));
+        // cout<<tri_map[3]->_row<<endl;
+        // cout<<tri_map[3]->_col<<endl;
+        // cout<<tri_map[3]->val<<endl;
         for (auto i = tri_map.begin(); i != tri_map.end(); i++)
         {
-            Triple<T> *tri = i->second;
+            auto tri = i->second;
             mat[tri->_row][tri->_col] = tri->val;
         }
         for (size_t i = 0; i < this->getRow(); i++)

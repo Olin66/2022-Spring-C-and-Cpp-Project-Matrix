@@ -150,6 +150,15 @@ namespace mat {
         }
 
         static Matrix<T> * eye(int row, int col, MATRIX_TYPE type){
+            if (row <= 0 || col <= 0) {
+                throw ex::InvalidSizeException("creating Matrix", 1, row, col);
+            }
+            if (type){
+                BasicMatrix<T> mat(row, col);
+                for (size_t i = 0; i < row; i++)
+                    mat.setByIndex(i, i, 1);
+                return &mat;
+            }
         }
     };
 

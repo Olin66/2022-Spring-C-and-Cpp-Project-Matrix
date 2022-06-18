@@ -23,6 +23,7 @@ namespace mat {
         class NotSquareException;
         class NoInverseException;
         class InvalidSizeException;
+        class InvalidTripleException;
     }
 
 template <typename>

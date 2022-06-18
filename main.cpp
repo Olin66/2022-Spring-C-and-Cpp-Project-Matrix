@@ -35,6 +35,7 @@ void matrix_cross_product() {
     bm1.crossProduct(bm2);
     bm1.show();
 }
+
 int main() {
     // matrix_cross_product();
     // return 0;
@@ -107,4 +108,21 @@ int main() {
 
     BasicMatrix<int> m4(2, 2, 100);
     m4.show();
+
+    vector<Triple<int>> v3;
+    v3.push_back(Triple<int>(1, 1, 4));
+    v3.push_back(Triple<int>(1, 0, 1));
+    // v3.push_back(Triple<int>(1, 1, 2));
+    // v3.push_back(Triple<int>(2, 2, 4));
+    SparseMatrix<int> sm2(2, 2, v3);
+    sm2.show();
+    SparseMatrix<int> sm3(sm2);
+    // cout<<sm3.getTriples()[3]->_row<<endl;
+    // cout<<sm3.getTriples()[3]->_col<<endl;
+    // cout<<sm3.getTriples()[3]->val<<endl;
+    sm3.show();
+
+    SparseMatrix<int> sm4(2, 2);
+    sm4 = sm3;
+    sm4.show();
 }

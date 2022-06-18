@@ -50,6 +50,16 @@ namespace mat {
             }
         };
 
+        class InvalidTripleException: public MatrixException{
+            private:
+                int i1, i2;
+            public:
+                 InvalidTripleException(int i1, int i2): i1(i1), i2(i2){};
+            const char * what() override{
+                return (new std::string("The matrix exception occurs when creating SparseMatrix with invalid triple index = "+std::to_string(i1) +" and " +std::to_string(i2)+"!"))->c_str();
+            }
+        };
+
         class MismatchedSizeException : public MatrixException {
         private:
             int l_row, l_col, r_row, r_col;
