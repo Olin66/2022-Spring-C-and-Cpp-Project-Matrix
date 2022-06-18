@@ -32,6 +32,9 @@ class Matrix;
 template <typename>
 class SparseMatrix;
 
+template <typename>
+struct Triple;
+
 template <class T>
 class BasicMatrix : public Matrix<T> {
   private:
@@ -236,9 +239,9 @@ void BasicMatrix<T>::add(const SparseMatrix<T> & right) {
                                           "matrix addition");
     for (auto it = right.getTriples().begin();it != right.getTriples().end();it++)
     {
-        auto tri = *it;
-        T point = getByIndex(tri._row, tri._col) + tri.val;
-        setByIndex(tri._row, tri._col, point);
+        Triple<T> *tri = it->second;
+        T point = getByIndex(tri->_row, tri->_col) + tri->val;
+        setByIndex(tri->_row, tri->_col, point);
     }
 }
 
@@ -260,9 +263,9 @@ void BasicMatrix<T>::subtract(const SparseMatrix<T> & right) {
                                           "matrix subtraction");
     for (auto it = right.getTriples().begin();it != right.getTriples().end();it++)
     {
-        auto tri = *it;
-        T point = getByIndex(tri._row, tri._col) - tri.val;
-        setByIndex(tri._row, tri._col, point);
+        Triple<T> *tri = it->second;
+        T point = getByIndex(tri->_row, tri->_col) - tri->val;
+        setByIndex(tri->_row, tri->_col, point);
     }
 }
 

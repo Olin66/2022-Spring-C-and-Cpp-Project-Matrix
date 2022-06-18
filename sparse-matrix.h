@@ -9,7 +9,7 @@
 #include <math.h>
 #include <string>
 #include <vector>
-#include <set>
+#include <map>
 
 namespace mat {
     namespace ex {
@@ -22,9 +22,11 @@ namespace mat {
     }
     template<typename T>
     struct Triple {
-        long _row;
-        long _col;
+        int _row;
+        int _col;
         T val;
+
+        Triple(int _row, int _col, T val): _row(_row), _col(_col), val(val) {}
 
         bool operator==(const Triple<T> & right){
             if (this->_row == right._row && this->_col == right._col) {
@@ -45,11 +47,7 @@ namespace mat {
     class SparseMatrix : public Matrix<T> {
     private:
         long size;
-        std::set<Triple<T>> triples;
-
-        inline void addEle(Triple<T> tri) {
-            triples.insert(tri);
-        }
+        std::map<int, Triple<T>*> tri_map;
     public:
         SparseMatrix(int, int);
 
@@ -61,7 +59,7 @@ namespace mat {
 
         SparseMatrix(int, int, std::vector<Triple<T>>);
 
-        SparseMatrix(int, int, std::set<Triple<T>>);
+        SparseMatrix(int, int, std::map<int, Triple<T>*>);
 
         SparseMatrix(const SparseMatrix<T> &);
 
@@ -147,8 +145,8 @@ namespace mat {
 
         void exponent(int exp);
 
-        std::set<Triple<T>> getTriples() const{
-            return this->triples;
+        std::map<int , Triple<T>*> getTriples() const {
+            return this->tri_map;
         }
 
         void show();
@@ -164,49 +162,49 @@ namespace mat {
 
     template<class T>
     SparseMatrix<T>::SparseMatrix(std::vector<std::vector<T>> mat): Matrix<T>(mat.size(), mat[0].size()) {
-        for (size_t i = 0; i < mat.size(); i++)
-        {
-            for (size_t j = 0; j < mat[i].size(); j++)
-            {
-                if (mat[i][j] != 0) {
-                    Triple<T> triple(i, j, mat[i][j]);
-                    triples.insert(triple);
-                }
-            }
+        // FIXME:
+        // for (size_t i = 0; i < mat.size(); i++)
+        // {
+        //     for (size_t j = 0; j < mat[i].size(); j++)
+        //     {
+        //         if (mat[i][j] != 0) {
+        //             Triple<T> triple(i, j, mat[i][j]);
+        //             tri_map.insert(triple);
+        //         }
+        //     }
             
-        }
-        
+        // }
     }
 
     template<class T>
     SparseMatrix<T>::SparseMatrix(int row, int col, T* _data): Matrix<T>(row, col){
-        for (size_t i = 0; i < this->getSize(); i++)
-        {
-            if (_data[i] != 0) {
-                Triple<T> triple(i/this->getCol(), i%this->getCol(), _data[i]);
-                triples.insert(triple);
-            }
-        }
+        // for (size_t i = 0; i < this->getSize(); i++)
+        // {
+        //     if (_data[i] != 0) {
+        //         Triple<T> triple(i/this->getCol(), i%this->getCol(), _data[i]);
+        //         tri_map.insert(triple);
+        //     }
+        // }
     }
 
     template<class T>
     SparseMatrix<T>::SparseMatrix(int row, int col, std::vector<Triple<T>> mat): Matrix<T>(row, col){
-        std::set<Triple<T>> temp(mat.begin(), mat.end());
-        if (mat.size() != temp.size()) {
-            throw ex::DuplicatedTripleException();
-        }
-        mat.assign(temp.begin(), temp.end());
-        this->triples(mat);
+        // std::set<Triple<T>> temp(mat.begin(), mat.end());
+        // if (mat.size() != temp.size()) {
+        //     throw ex::DuplicatedTripleException();
+        // }
+        //mat.assign(temp.begin(), temp.end());
+        //this->tri_map(mat);
     }
 
     template<class T>
-    SparseMatrix<T>::SparseMatrix(int row, int col, std::set<Triple<T>> mat): Matrix<T>(row, col){
-        this->triples(mat);
+    SparseMatrix<T>::SparseMatrix(int row, int col, std::map<int , Triple<T>*> _map): Matrix<T>(row, col){
+        this->tri_map = _map;
     }
 
     template<class T>
     SparseMatrix<T>::SparseMatrix(const SparseMatrix<T> & right): Matrix<T>(right.getRow(), right.getCol()){
-        this->triples(right.triples);
+        this->tri_map(right.tri_map);
     }
 
     template<class T>
@@ -214,36 +212,28 @@ namespace mat {
         this->setSize(right.getSize());
         this->setRow(right.getRow());
         this->setCol(right.getCol());
-        this->triples(right.triples);
+        //this->tri_map(right.tri_map);
+        // TODO:
     }
 
     template <class T>
     T SparseMatrix<T>::getByIndex(int _row, int _col) const {
-        T target=0;
-        for (int i = 0; i < this->triples.size(); i++)
-        {
-            if (this->triples[i]._col==_col &&this->triples[i]._row==_row)
-            {
-                return target=this->triples[i].val;
-            }
-            
-        }
-        return target;
+        int index = _row * this->col + _col;
+        if (tri_map.find(index)->second == nullptr)
+            return 0;
+        else 
+            return tri_map.find(index)->second->val;
     }
 
     template <class T>
     void SparseMatrix<T>::setByIndex(int _row, int _col, T val) {
-        for (int i = 0; i < this->triples.size(); i++)
-        {
-            if (this->triples[i]._row==_row&&this->triples[i]._col==_col)
-            {
-                this->triples[i].val=val;
-                return;
-            }
+        int index = _row * this->col + _col;
+        if (tri_map[index] == nullptr) {
+            Triple<T> t(_row, _col, val);
+            tri_map[index] = &t;
+        } else {
+            tri_map[index]->val = val;
         }
-        Triple<T>triple(_row,_col,val);
-        this->addEle(triple);
-        return;
     }
 
     template<class T>
@@ -253,12 +243,12 @@ namespace mat {
     template<class T>
     void SparseMatrix<T>::add(const SparseMatrix<T> &right) {
         SparseMatrix<T> mat(this->row, this->col);
-        for (int i = 0; i < this->triples.size(); i++) {
-            for (int j = 0; j < right.triples.size(); j++) {
-                Triple<T> LP = triples[i];
-                Triple<T> RP = triples[j];
-                if (LP._row == RP._row && LP._row == RP._row) {
-                    mat.setByIndex(LP._row, LP._col, LP.val + RP.val);
+        for (auto i = this->tri_map.begin(); i != this->tri_map.end(); i++) {
+            for (auto j = right.tri_map.begin(); j != right.tri_map.end(); j++) {
+                Triple<T>* LP = i->second;
+                Triple<T>* RP = j->second;
+                if (LP->_row == RP->_row && LP->_row == RP->_row) {
+                    mat.setByIndex(LP->_row, LP->_col, LP->val + RP->val);
                 }
             }
         }
@@ -272,12 +262,12 @@ namespace mat {
     template<class T>
     void SparseMatrix<T>::subtract(const SparseMatrix<T> &right) {
         SparseMatrix<T> mat(this->row, this->col);
-        for (int i = 0; i < this->triples.size(); i++) {
-            for (int j = 0; j < right.triples.size(); j++) {
-                Triple<T> LP = triples[i];
-                Triple<T> RP = triples[j];
-                if (LP._row == RP._row && LP._row == RP._row) {
-                    mat.setByIndex(LP._row, LP._col, LP.val - RP.val);
+        for (auto i = this->tri_map.begin(); i != this->tri_map.end(); i++) {
+            for (auto j = right.tri_map.begin(); j != right.tri_map.end(); j++) {
+                Triple<T>* LP = i->second;
+                Triple<T>* RP = j->second;
+                if (LP->_row == RP->_row && LP->_row == RP->_row) {
+                    mat.setByIndex(LP->_row, LP->_col, LP->val - RP->val);
                 }
             }
         }
@@ -286,15 +276,17 @@ namespace mat {
 
     template<class T>
     void SparseMatrix<T>::scalarMultiply(T x) {
-        for (int i = 0; i < this->triples.size(); i++) {
-            this->triples[i] *= x;
+        for (auto i = this->tri_map.begin(); i != this->tri_map.end(); i++) {
+            Triple<T> *tri = i->second;
+            this->setByIndex(tri->_row, tri->_col, tri->val * x);
         }
     }
 
     template<class T>
     void SparseMatrix<T>::scalarDivide(T x) {
-        for (int i = 0; i < this->triples.size(); i++) {
-            this->triples[i] /= x;
+        for (auto i = this->tri_map.begin(); i != this->tri_map.end(); i++) {
+            Triple<T> *tri = i->second;
+            this->setByIndex(tri->_row, tri->_col, tri->val / x);
         }
     }
 
@@ -315,26 +307,26 @@ namespace mat {
         int c = right.col;
         if (this->col == 1) {
             SparseMatrix<T> mat(r, 1);
-            for (int i = 0; i < this->triples.size(); i++) {
-                for (int j = 0; j < right.triples.size(); j++) {
-                    mat::Triple<T>& l_point = this->triples[i];
-                    mat::Triple<T>& r_point = right.triples[j];
-                    if (l_point._row == r_point._row) {
-                        mat.setByIndex(r_point._row, r_point._col, l_point.val * r_point.val);
+            for (auto i = this->tri_map.begin(); i != this->tri_map.end(); i++) {
+                for (auto j = right.tri_map.begin(); j != right.tri_map.end(); j++) {
+                    Triple<T>* LP = i->second;
+                    Triple<T>* RP = j->second;
+                    if (LP->_row == RP->_row && LP->_row == RP->_row) {
+                        mat.setByIndex(RP->_row, RP->_col, LP->val * RP->val);
                     }
                 }
             }
             *this = mat;
         } else {
             SparseMatrix<T> mat(r, c);
-            for (int i = 0; i < this->triples.size(); i++) {
-                for (int j = 0;j  < right.triples.size(); j++) {
-                    mat::Triple<T>& l_point = this->triples[i];
-                    mat::Triple<T>& r_point = right.triples[i];
-                    if (l_point._row == r_point._row &&
-                        l_point._col == r_point._col) {
-                            mat.setByIndex(r_point._row, r_point._col, l_point.val * r_point.val);
-                        }
+            for (auto i = this->tri_map.begin(); i != this->tri_map.end(); i++) {
+                for (auto j = right.tri_map.begin(); j != right.tri_map.end(); j++) {
+                    Triple<T>* LP = i->second;
+                    Triple<T>* RP = j->second;
+                    if (LP->_row == RP->_row &&
+                        LP->_col == RP->_col) {
+                        mat.setByIndex(RP->_row, RP->_col, LP->val * RP->val);
+                    }
                 }
             }
             *this = mat;
@@ -354,12 +346,12 @@ namespace mat {
         int r = this->row;
         int c = right.col;
         SparseMatrix<T> mat(r, c);
-        for (int i = 0; i < this->triples.size(); i++) {
-            Triple<T>& l_point = this->triples[i];
-            for (int j = 0; j < right.triples.size(); j++) {
-                Triple<T>& r_point = right.triples[j];
-                if (l_point._col == r_point._row) {
-                    mat.setByIndex(l_point._row, r_point._col, mat.getByIndex(l_point._row, r_point._col) + l_point.val * r_point.val);
+        for (auto i = this->tri_map.begin(); i != this->tri_map.end(); i++) {
+            Triple<T> *l_point = i->second;
+            for (auto j = right.tri_map.begin(); j != right.tri_map.end(); j++) {
+                Triple<T> *r_point = j->second;
+                if (l_point->_col == r_point->_row) {
+                    mat.setByIndex(l_point->_row, r_point->_col, mat.getByIndex(l_point->_row, r_point->_col) + l_point->val * r_point->val);
                 }
             }
         }
@@ -389,88 +381,85 @@ namespace mat {
     template<class T>
     T SparseMatrix<T>::getMax() {
         T max=0;
-        for (int i = 0;i< this->triples.size(); i++)
-        {
-            if (max<this->triples[i].val)
-            {
-                max=this->triples[i].val;
-            }
+        // for (int i = 0;i< this->tri_map.size(); i++)
+        // {
+        //     if (max<this->tri_map[i].val)
+        //     {
+        //         max=this->tri_map[i].val;
+        //     }
             
-        }
+        // }
         return max;
     }
 
     template<class T>
     T SparseMatrix<T>::getMin() {
         T min=0;
-        for (int i = 0; i < this->triples.size(); i++)
-        {
-            if (min>this->triples[i].val)
-            {
-                min=this->triples[i].val;
-            }
+        // for (int i = 0; i < this->tri_map.size(); i++)
+        // {
+        //     if (min>this->tri_map[i].val)
+        //     {
+        //         min=this->tri_map[i].val;
+        //     }
             
-        }
+        // }
         return min;
-        
-        
     }
 
     template<class T>
     T SparseMatrix<T>::getSum() {
         T sum=0;
-        for (int i = 0; i < this->triples.size(); i++)
-        {
-            sum+=this->triples[i].val;
-        }
+        // for (int i = 0; i < this->tri_map.size(); i++)
+        // {
+        //     sum+=this->tri_map[i].val;
+        // }
         return sum;
         
     }
 
     template<class T>
     T SparseMatrix<T>::getAvg() {
-        return this->getSum/(this->col*this->row);
+        return this->getSum()/(this->col*this->row);
     }
 
     template<class T>
     T SparseMatrix<T>::getRowMax(int row) {
         T max=0;
-        for (int i = 0; i < this->triples.size(); i++)
-        {
-            if (max<this->triples[i].val&&this->triples[i]._row==row)
-            {
-                max=this->triples[i].val;
-            }
+        // for (int i = 0; i < this->tri_map.size(); i++)
+        // {
+        //     if (max<this->tri_map[i].val&&this->tri_map[i]._row==row)
+        //     {
+        //         max=this->tri_map[i].val;
+        //     }
             
-        }
+        // }
         return max;
     }
 
     template<class T>
     T SparseMatrix<T>::getColMax(int col) {
         T max=0;
-        for (int i = 0; i < this->triples.size(); i++)
-        {
-            if (max<this->triples[i].val&&this->triples[i]._col==col)
-            {
-                max=this->triples[i].val;
-            }
-            
-        }
+        // for (int i = 0; i < this->tri_map.size(); i++)
+        // {
+        //     if (max<this->tri_map[i].val&&this->tri_map[i]._col==col)
+        //     {
+        //         max=this->tri_map[i].val;
+        //     }
+        // }
         return max;
     }
 
     template<class T>
     T SparseMatrix<T>::getRowMin(int row) {
         T min=0;
-        for (int i = 0; i < this->triples.size(); i++)
-        {
-            if (min>this->triples[i].val&&this->triples[i]._row==row)
-            {
-                min=this->triples[i].val;
-            }
+        // for (int i = 0; i < this->tri_map.size(); i++)
+        // {
+        //     if (min>this->tri_map[i].val&&this->tri_map[i]._row==row)
+        //     {
+        //         min=this->tri_map[i].val;
+        //     }
             
-        }
+        // }
         return min;
 
     }
@@ -478,42 +467,42 @@ namespace mat {
     template<class T>
     T SparseMatrix<T>::getColMin(int col) {
          T min=0;
-        for (int i = 0; i < this->triples.size(); i++)
-        {
-            if (min>this->triples[i].val&&this->triples[i]._col==col)
-            {
-                min=this->triples[i].val;
-            }
+        // for (int i = 0; i < this->tri_map.size(); i++)
+        // {
+        //     if (min>this->tri_map[i].val&&this->tri_map[i]._col==col)
+        //     {
+        //         min=this->tri_map[i].val;
+        //     }
             
-        }
+        // }
         return min;
     }
 
     template<class T>
     T SparseMatrix<T>::getRowSum(int row) {
         T sum=0;
-        for (int i = 0; i < this->triples.size(); i++)
-        {
-            if (this->triples[i]._row==row)
-            {
-                sum+=this->triples[i].val;
-            }
+        // for (int i = 0; i < this->tri_map.size(); i++)
+        // {
+        //     if (this->tri_map[i]._row==row)
+        //     {
+        //         sum+=this->tri_map[i].val;
+        //     }
             
-        }
+        // }
         return sum;
     }
 
     template<class T>
     T SparseMatrix<T>::getColSum(int col) {
         T sum=0;
-        for (int i = 0; i < this->triples.size(); i++)
-        {
-            if (this->triples[i]._col==col)
-            {
-                sum+=this->triples[i].val;
-            }
+        // for (int i = 0; i < this->tri_map.size(); i++)
+        // {
+        //     if (this->tri_map[i]._col==col)
+        //     {
+        //         sum+=this->tri_map[i].val;
+        //     }
             
-        }
+        // }
         return sum;
     }
 
@@ -549,12 +538,12 @@ namespace mat {
     if (this->getSize() == _size) {
         this->setRow(col);
         this->setCol(row);
-        for (size_t i = 0; i < this->getTriples().size(); i++)
+        for (auto i = tri_map.begin(); i != tri_map.end(); i++)
         {
-            Triple<T>& tri = this->getTriples()[i];
-            int temp = tri._col;
-            tri._col = tri._row;
-            tri._row = temp;
+            Triple<T> *tri = i->second;
+            int temp = tri->_col;
+            tri->_col = tri->_row;
+            tri->_row = temp;
         }
     } else
         throw ex::MismatchedSizeException(this->getRow(), this->getCol(), row, col, "matrix reshaping");
@@ -594,10 +583,10 @@ namespace mat {
         using namespace std;
         T mat[this->getRow()][this->getCol()];
         memset(mat, 0, sizeof(mat));
-        for (size_t i = 0; i < this->getTriples().size(); i++)
+        for (auto i = tri_map.begin(); i != tri_map.end(); i++)
         {
-            Triple<T> tri = this->getTriples()[i];
-            mat[tri._row][tri._col] = tri.val;
+            Triple<T> *tri = i->second;
+            mat[tri->_row][tri->_col] = tri->val;
         }
         for (size_t i = 0; i < this->getRow(); i++)
         {

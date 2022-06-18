@@ -85,7 +85,7 @@ int main() {
     // }
     
 
-    // SparseMatrix<int> sm1(v);
+    SparseMatrix<int> sm1(v);
     // sm1.show();
 
     cout<<endl;
