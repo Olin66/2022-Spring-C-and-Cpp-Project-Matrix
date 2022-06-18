@@ -1,4 +1,5 @@
 #include <iostream>
+#include <opencv2/opencv.hpp>
 #include <vector>
 #include "matrix.h"
 #include "basic-matrix.h"
@@ -6,6 +7,7 @@
 #define SPARSE_MATRIX_INT SparseMatrix<int>
 using namespace std;
 using namespace mat;
+using namespace cv;
 
 void matrix_dot_product() {
     const int TEST_SIZE = 6;
@@ -125,4 +127,6 @@ int main() {
     SparseMatrix<int> sm4(2, 2);
     sm4 = sm3;
     sm4.show();
+
+    Mat mat1(2, 2, CV_8UC1);
 }

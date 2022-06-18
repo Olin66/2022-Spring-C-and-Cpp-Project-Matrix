@@ -17,6 +17,16 @@ namespace mat {
             }
         };
 
+        class InvalidChannelDepth: public MatrixException{
+            private:
+                int depth;
+            public:
+                InvalidChannelDepth(int d): depth(d) {};
+                const char * what() override{
+                    return (new std::string("The matrix is created with invalid channels = " + depth))->c_str();
+                }
+        };
+
         class InvalidSizeException: public MatrixException{
             private:
             int choice;

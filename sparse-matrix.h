@@ -21,6 +21,7 @@ namespace mat {
         class NoInverseException;
         class InvalidSizeException;
         class InvalidTripleException;
+        class InvalidChannelDepth;
     }
     template<typename T>
     struct Triple {
@@ -71,6 +72,8 @@ namespace mat {
 
         SparseMatrix<T>& operator=(const SparseMatrix<T> &);
 
+        ~SparseMatrix<T>();
+
         void add(const BasicMatrix<T> &);
 
         void add(const SparseMatrix<T> &);
@@ -85,11 +88,7 @@ namespace mat {
 
         void scalarDivide(std::complex<long double>);
 
-        void dotProduct(const BasicMatrix<T> &);
-
         void dotProduct(const SparseMatrix<T> &);
-
-        void crossProduct(const BasicMatrix<T> &);
 
         void crossProduct(const SparseMatrix<T> &);
 
@@ -256,6 +255,15 @@ namespace mat {
         }
     }
 
+    template<class T>
+    SparseMatrix<T>::~SparseMatrix<T>(){
+        for (auto it = this->tri_map.begin(); it != tri_map.end();it++)
+        {
+            if (it->second != nullptr) delete it->second;
+        }
+        this->tri_map.clear();
+    }
+
     template <class T>
     T SparseMatrix<T>::getByIndex(int _row, int _col) const {
         int index = _row * this->col + _col;
@@ -277,10 +285,6 @@ namespace mat {
     }
 
     template<class T>
-    void SparseMatrix<T>::add(const BasicMatrix<T> &) {
-    }
-
-    template<class T>
     void SparseMatrix<T>::add(const SparseMatrix<T> &right) {
         SparseMatrix<T> mat(this->row, this->col);
         for (auto i = this->tri_map.begin(); i != this->tri_map.end(); i++) {
@@ -293,10 +297,6 @@ namespace mat {
             }
         }
         *this = mat;
-    }
-
-    template<class T>
-    void SparseMatrix<T>::subtract(const BasicMatrix<T> &) {
     }
 
     template<class T>
@@ -328,11 +328,6 @@ namespace mat {
             Triple<T> *tri = i->second;
             this->setByIndex(tri->_row, tri->_col, tri->val / x);
         }
-    }
-
-    template<class T>
-    void SparseMatrix<T>::dotProduct(const BasicMatrix<T> &) {
-
     }
 
     template<class T>
@@ -371,11 +366,6 @@ namespace mat {
             }
             *this = mat;
         }
-    }
-
-    template<class T>
-    void SparseMatrix<T>::crossProduct(const BasicMatrix<T> &) {
-
     }
 
     template<class T>

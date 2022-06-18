@@ -3,7 +3,7 @@
 
 #include <ccomplex>
 #include <cstring>
-// #include <opencv2/opencv.hpp>
+#include <opencv2/opencv.hpp>
 
 #include "basic-matrix.h"
 #include "sparse-matrix.h"
@@ -41,11 +41,11 @@ namespace mat {
             this->size = this->row * this->col;
         }
 
-        // Matrix(const cv::Mat &mat) {
-        //     this->row = mat.rows;
-        //     this->col = mat.cols;
-        //     this->size = this->row * this->col;
-        // }
+        Matrix(const cv::Mat &mat) {
+            this->row = mat.rows;
+            this->col = mat.cols;
+            this->size = this->row * this->col;
+        }
 
         void setSize(const long size) {
             this->size = size;
@@ -75,25 +75,9 @@ namespace mat {
 
         virtual void setByIndex(int _row, int _col, T val) = 0;
 
-        virtual void add(const BasicMatrix<T> &) = 0;
-
-        virtual void add(const SparseMatrix<T> &) = 0;
-
-        virtual void subtract(const BasicMatrix<T> &) = 0;
-
-        virtual void subtract(const SparseMatrix<T> &) = 0;
-
         virtual void scalarMultiply(T) = 0;
 
         virtual void scalarDivide(T) = 0;
-
-        virtual void dotProduct(const BasicMatrix<T> &) = 0;
-
-        virtual void dotProduct(const SparseMatrix<T> &) = 0;
-
-        virtual void crossProduct(const BasicMatrix<T> &) = 0;
-
-        virtual void crossProduct(const SparseMatrix<T> &) = 0;
 
         virtual void transpose() = 0;
 
@@ -153,12 +137,17 @@ namespace mat {
             if (row <= 0 || col <= 0) {
                 throw ex::InvalidSizeException("creating Matrix", 1, row, col);
             }
+            Matrix<T>* mat;
             if (type){
-                BasicMatrix<T> mat(row, col);
+                mat = new BasicMatrix<T>(row, col);
                 for (size_t i = 0; i < row; i++)
                     mat.setByIndex(i, i, 1);
-                return &mat;
+            } else{
+                mat = new SparseMatrix<T>(row, col);
+                for (size_t i = 0; i < row; i++)
+                    mat->setByIndex(i,i,1);
             }
+            return mat;
         }
     };
 

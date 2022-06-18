@@ -3,13 +3,15 @@
 #include "matrix-ex.h"
 #include "matrix.h"
 #include "sparse-matrix.h"
+#include <opencv2/opencv.hpp>
 #include <cstring>
 #include <iostream>
-#include <math.h>
+#include <cmath>
 #include <string>
 #include <vector>
 #include<complex>
 using namespace std;
+using namespace cv;
 namespace mat {
 
 #define ZERO_MATRIX 0
@@ -24,6 +26,7 @@ namespace mat {
         class NoInverseException;
         class InvalidSizeException;
         class InvalidTripleException;
+        class InvalidChannelDepth;
     }
 
 template <typename>
@@ -45,7 +48,7 @@ class BasicMatrix : public Matrix<T> {
 
     BasicMatrix(int, int, T *);
 
-    // BasicMatrix(const cv::Mat &mat);
+    BasicMatrix(const cv::Mat &mat);
 
     BasicMatrix(std::vector<std::vector<T>>);
 
@@ -57,11 +60,7 @@ class BasicMatrix : public Matrix<T> {
 
     void add(const BasicMatrix<T> &);
 
-    void add(const SparseMatrix<T> &);
-
     void subtract(const BasicMatrix<T> &);
-
-    void subtract(const SparseMatrix<T> &);
 
     void scalarMultiply(T);
 
@@ -69,11 +68,7 @@ class BasicMatrix : public Matrix<T> {
 
     void dotProduct(const BasicMatrix<T> &);
 
-    void dotProduct(const SparseMatrix<T> &);
-
     void crossProduct(const BasicMatrix<T> &);
-
-    void crossProduct(const SparseMatrix<T> &);
 
     void transpose();
 
@@ -177,10 +172,14 @@ BasicMatrix<T>::BasicMatrix(int row, int col, T *_data) : Matrix<T>(row, col) {
         this->m_data[i] = _data[i];
 }
 
-// template<class T>
-// BasicMatrix<T>::BasicMatrix(const cv::Mat &mat):Matrix<T>(mat) {
-
-// }
+template<class T>
+BasicMatrix<T>::BasicMatrix(const cv::Mat &mat): Matrix<T>(mat) {
+    if (mat.type() != CV_8UC1)
+        throw ex::InvalidChannelDepth(mat.type);
+    for (size_t i = 0; i < this->getSize(); i++)
+        this->m_data[i] = mat.data[i];
+    
+}
 
 template <class T>
 BasicMatrix<T>::BasicMatrix(std::vector<std::vector<T>> mat) : Matrix<T>(mat.size(), mat[0].size()) {
@@ -235,19 +234,6 @@ void BasicMatrix<T>::add(const BasicMatrix<T> &right) {
 }
 
 template <class T>
-void BasicMatrix<T>::add(const SparseMatrix<T> & right) {
-    if (this->getRow() != right.getRow() || this->getCol() != right.getCol())
-        throw ex::MismatchedSizeException(*this, right,
-                                          "matrix addition");
-    for (auto it = right.getTriples().begin();it != right.getTriples().end();it++)
-    {
-        Triple<T> *tri = it->second;
-        T point = getByIndex(tri->_row, tri->_col) + tri->val;
-        setByIndex(tri->_row, tri->_col, point);
-    }
-}
-
-template <class T>
 void BasicMatrix<T>::subtract(const BasicMatrix<T> &right) {
     if (this->getRow() != right.getRow() || this->getCol() != right.getCol()) {
         throw ex::MismatchedSizeException(*this, right,
@@ -255,19 +241,6 @@ void BasicMatrix<T>::subtract(const BasicMatrix<T> &right) {
     }
     for (size_t i = 0; i < this->getSize(); i++) {
         this->m_data[i] = this->m_data[i] - right.m_data[i];
-    }
-}
-
-template <class T>
-void BasicMatrix<T>::subtract(const SparseMatrix<T> & right) {
-    if (this->getRow() != right.getRow() || this->getCol() != right.getCol())
-        throw ex::MismatchedSizeException(*this, right,
-                                          "matrix subtraction");
-    for (auto it = right.getTriples().begin();it != right.getTriples().end();it++)
-    {
-        Triple<T> *tri = it->second;
-        T point = getByIndex(tri->_row, tri->_col) - tri->val;
-        setByIndex(tri->_row, tri->_col, point);
     }
 }
 
@@ -316,11 +289,6 @@ void BasicMatrix<T>::dotProduct(const BasicMatrix<T> &right) {
 }
 
 template <class T>
-void BasicMatrix<T>::dotProduct(const SparseMatrix<T> &right) {
-    
-}
-
-template <class T>
 void BasicMatrix<T>::crossProduct(const BasicMatrix<T> &right) {
     if (this->col != right.row) {
         throw ex::MismatchedSizeException(*this, right, "matrix cross product");
@@ -337,10 +305,6 @@ void BasicMatrix<T>::crossProduct(const BasicMatrix<T> &right) {
         }
     }
     *this = mat;
-}
-
-template <class T>
-void BasicMatrix<T>::crossProduct(const SparseMatrix<T> &) {
 }
 
 template <class T>
