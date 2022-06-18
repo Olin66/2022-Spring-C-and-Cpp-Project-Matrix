@@ -6,15 +6,16 @@
 #define SPARSE_MATRIX_INT SparseMatrix<int>
 using namespace std;
 using namespace mat;
+using namespace cv;
 void matrix_dot_product();
 void matrix_cross_product();
 void matrix_convolution();
 
 int main() {
-    matrix_dot_product();
-    matrix_cross_product();
-    //matrix_convolution();
-    return 0;
+    // matrix_dot_product();
+    // matrix_cross_product();
+    // //matrix_convolution();
+    // return 0;
 
     Matrix<int> *m;
     BasicMatrix<int> bm1(3, 2);
@@ -100,6 +101,17 @@ int main() {
     SparseMatrix<int> sm4(2, 2);
     sm4 = sm3;
     sm4.show();
+
+    Mat mat1(5, 5, CV_8UC1);
+    BasicMatrix<int> mmm1(mat1);
+    Mat mat2 = imread("./img/conan1.png");
+    Mat grey;
+    cvtColor(mat2,grey,CV_BGR2GRAY);
+    // imshow("grey",grey);
+	BasicMatrix<int> mm2(grey);
+    // mm2.show();
+    SparseMatrix<int> mm3(grey);
+    mm3.show();
 }
 
 void matrix_dot_product() {

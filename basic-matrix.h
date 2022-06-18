@@ -3,15 +3,15 @@
 #include "matrix-ex.h"
 #include "matrix.h"
 #include "sparse-matrix.h"
-// #include <opencv2/opencv.hpp>
+#include <opencv2/opencv.hpp>
 #include <cstring>
 #include <iostream>
 #include <cmath>
 #include <string>
 #include <vector>
-#include<complex>
+#include <complex>
 using namespace std;
-// using namespace cv;
+using namespace cv;
 namespace mat {
     namespace ex {
         class MatrixException;
@@ -43,9 +43,9 @@ namespace mat {
 
         BasicMatrix(int, int, T *);
 
-        // BasicMatrix(const cv::Mat &mat);
+        BasicMatrix(const Mat &mat);
 
-        BasicMatrix(std::vector<std::vector<T>>);
+        BasicMatrix(vector<vector<T>>);
 
         BasicMatrix(const BasicMatrix<T> &);
 
@@ -136,6 +136,8 @@ namespace mat {
         template <typename P>
         BasicMatrix<T> operator*(P);
 
+        Mat* getCvMat();
+
         template <typename P>
         friend BasicMatrix<T> operator*(P val, BasicMatrix<T>& right){
             return right * val;
@@ -147,9 +149,23 @@ namespace mat {
     };
 
     template <class T>
+    Mat* BasicMatrix<T>::getCvMat(){
+        Mat* mat = new Mat(this->getRow(), this->getCol(), CV_8UC1);
+        for (size_t i = 0; i < this->getRow(); i++)
+        {
+           for (size_t j = 0; j < this->getCol(); j++)
+           {
+                double re = real(getByIndex(i, j));
+                mat->at<double>(i, j) = re;
+           }
+        }
+        return mat;
+    }
+
+    template <class T>
     BasicMatrix<T>::BasicMatrix(int row, int col, T val) : Matrix<T>(row, col) {
         this->m_data = new T[this->getSize()];
-        if (val == 0) std::memset(m_data, 0, sizeof(T) * this->getSize());
+        if (val == 0) memset(m_data, 0, sizeof(T) * this->getSize());
         else {
             for (size_t i = 0; i < this->getSize(); i++)
                 m_data[i] = val;
@@ -163,17 +179,22 @@ namespace mat {
             this->m_data[i] = _data[i];
     }
 
-    // template<class T>
-    // BasicMatrix<T>::BasicMatrix(const cv::Mat &mat): Matrix<T>(mat) {
-    //     if (mat.type() != CV_8UC1)
-    //         throw ex::InvalidChannelDepth(mat.type);
-    //     for (size_t i = 0; i < this->getSize(); i++)
-    //         this->m_data[i] = mat.data[i];
-
-    // }
+    template<class T>
+    BasicMatrix<T>::BasicMatrix(const Mat &mat): Matrix<T>(mat) {
+        if (mat.channels() != 1)
+            throw ex::InvalidChannelDepth(mat.channels());
+        this->m_data = new T[this->getRow() * this->getCol()];
+        for (size_t i = 0; i < this->getRow(); i++)
+        {
+            for (size_t j = 0; j < this->getCol(); j++)
+            {
+                setByIndex(i, j, (T)mat.at<uchar>(i,j));
+            }
+        }
+    }
 
     template <class T>
-    BasicMatrix<T>::BasicMatrix(std::vector<std::vector<T>> mat) : Matrix<T>(mat.size(), mat[0].size()) {
+    BasicMatrix<T>::BasicMatrix(vector<vector<T>> mat) : Matrix<T>(mat.size(), mat[0].size()) {
         this->m_data = new T[this->getSize()];
         for (size_t i = 0; i < this->getSize(); i++)
             this->m_data[i] = mat[i / this->getCol()][i % this->getCol()];
@@ -1011,7 +1032,6 @@ namespace mat {
 
     template <class T>
     void BasicMatrix<T>::show() {
-        using namespace std;
         cout << "Basic Matrix:" << endl;
         for (int i = 0; i < this->row; i++) {
             for (int j = 0; j < this->col; j++)

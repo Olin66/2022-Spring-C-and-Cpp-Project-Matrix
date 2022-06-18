@@ -4,6 +4,7 @@
 #include "matrix.h"
 #include "basic-matrix.h"
 #include "matrix-ex.h"
+#include <opencv2/opencv.hpp>
 #include <cstring>
 #include <iostream>
 #include <math.h>
@@ -11,7 +12,8 @@
 #include <vector>
 #include <set>
 #include <map>
-
+using namespace std;
+using namespace cv;
 namespace mat {
     namespace ex {
         class MatrixException;
@@ -59,19 +61,19 @@ namespace mat {
     template<class T>
     class SparseMatrix : public Matrix<T> {
     private:
-        std::map<int, Triple<T> *> tri_map;
+        map<int, Triple<T> *> tri_map;
     public:
         SparseMatrix(int, int);
 
-        // SparseMatrix(const cv::Mat &mat);
+        SparseMatrix(const cv::Mat &mat);
 
-        SparseMatrix(std::vector<std::vector<T>>);
+        SparseMatrix(vector<vector<T>>);
 
         SparseMatrix(int, int, T *);
 
-        SparseMatrix(int, int, std::vector<Triple<T>>);
+        SparseMatrix(int, int, vector<Triple<T>>);
 
-        SparseMatrix(int, int, std::map<int, Triple<T> *>);
+        SparseMatrix(int, int, map<int, Triple<T> *>);
 
         SparseMatrix(const SparseMatrix<T> &);
 
@@ -147,23 +149,46 @@ namespace mat {
 
         void exponent(int exp);
 
-        std::map<int, Triple<T> *> getTriples() const {
+        map<int, Triple<T> *> getTriples() const {
             return this->tri_map;
         }
 
         void show();
+
+        cv::Mat* getCvMat();
     };
+
+    template<class T>
+    Mat* SparseMatrix<T>::getCvMat(){
+        Mat* mat = new Mat(this->getRow(), this->getCol(), CV_8UC1);
+        for (auto it = tri_map.begin(); it != tri_map.end(); it++)
+        {
+            auto tri = it->second;
+            double re = real(getByIndex(tri->_row, tri->_col));
+            mat->at<double>(tri->_row, tri->_col) = re;
+        }
+        return mat;
+    }
 
     template<class T>
     SparseMatrix<T>::SparseMatrix(int row, int col): Matrix<T>(row, col) {}
 
-    // template<class T>
-    // SparseMatrix<T>::SparseMatrix(const cv::Mat &mat) {
-
-    // }
+    template<class T>
+    SparseMatrix<T>::SparseMatrix(const cv::Mat &mat): Matrix<T>(mat) {
+        if (mat.channels() != 1)
+            throw ex::InvalidChannelDepth(mat.channels());
+        for (size_t i = 0; i < this->getRow(); i++)
+        {
+            for (size_t j = 0; j < this->getCol(); j++)
+            {
+                if ((T)mat.at<uchar>(i,j) != 0)
+                    setByIndex(i, j, (T)mat.at<uchar>(i,j));
+            }
+        }
+    }
 
     template<class T>
-    SparseMatrix<T>::SparseMatrix(std::vector<std::vector<T>> mat): Matrix<T>(mat.size(), mat[0].size()) {
+    SparseMatrix<T>::SparseMatrix(vector<vector<T>> mat): Matrix<T>(mat.size(), mat[0].size()) {
         for (size_t i = 0; i < mat.size(); i++) {
             for (size_t j = 0; j < mat[i].size(); j++) {
                 if (mat[i][j] != 0) {
@@ -183,8 +208,8 @@ namespace mat {
     }
 
     template<class T>
-    SparseMatrix<T>::SparseMatrix(int row, int col, std::vector<Triple<T>> mat): Matrix<T>(row, col) {
-        std::set<Triple<T>> temp(mat.begin(), mat.end());
+    SparseMatrix<T>::SparseMatrix(int row, int col, vector<Triple<T>> mat): Matrix<T>(row, col) {
+        set<Triple<T>> temp(mat.begin(), mat.end());
         if (mat.size() != temp.size()) {
             throw ex::DuplicatedTripleException();
         }
@@ -202,7 +227,7 @@ namespace mat {
     }
 
     template<class T>
-    SparseMatrix<T>::SparseMatrix(int row, int col, std::map<int, Triple<T> *> _map): Matrix<T>(row, col) {
+    SparseMatrix<T>::SparseMatrix(int row, int col, map<int, Triple<T> *> _map): Matrix<T>(row, col) {
         for (auto it = _map.begin(); it != _map.end(); it++) {
             Triple<T> temp = it;
             Triple<T> *t = new Triple<T>(temp->_row, temp->_col, temp->val);
@@ -366,7 +391,7 @@ namespace mat {
             for (auto j = right.tri_map.begin(); j != right.tri_map.end(); j++) {
                 Triple<T> *trj = j->second;
                 if (tri->_col == trj->_row) {
-                    std::cout << tri->_row << " " << trj->_col << " " << tri->val << " " << trj->val << std::endl;
+                    cout << tri->_row << " " << trj->_col << " " << tri->val << " " << trj->val << endl;
                     mat.setByIndex(tri->_row, trj->_col, mat.getByIndex(tri->_row, trj->_col) + tri->val * trj->val);
                 }
             }
@@ -387,7 +412,7 @@ namespace mat {
     template<class T>
     void SparseMatrix<T>::reverse() {
         int _size = this->getSize();
-        std::map<int, Triple<T> *> _map;
+        map<int, Triple<T> *> _map;
         for (auto it = this->tri_map.begin(); it != this->tri_map.end(); it++) {
             int index = it->first;
             Triple<T> *tri = it->second;

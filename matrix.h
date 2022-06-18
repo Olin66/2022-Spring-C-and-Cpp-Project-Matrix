@@ -3,10 +3,13 @@
 
 #include <ccomplex>
 #include <cstring>
-//#include <opencv2/opencv.hpp>
+#include <opencv2/opencv.hpp>
 
 #include "basic-matrix.h"
 #include "sparse-matrix.h"
+
+using namespace std;
+using namespace cv;
 
 namespace mat {
 
@@ -41,11 +44,11 @@ namespace mat {
             this->size = this->row * this->col;
         }
 
-//        Matrix(const cv::Mat &mat) {
-//            this->row = mat.rows;
-//            this->col = mat.cols;
-//            this->size = this->row * this->col;
-//        }
+       Matrix(const Mat &mat) {
+           this->row = mat.rows;
+           this->col = mat.cols;
+           this->size = this->row * this->col;
+       }
 
         void setSize(const long size) {
             this->size = size;
@@ -126,8 +129,10 @@ namespace mat {
         virtual void exponent(int) = 0;
 
         virtual void show() {
-            std::cout << "Base class Matrix" << std::endl;
+            cout << "Base class Matrix" << endl;
         }
+
+        virtual Mat* getCvMat() = 0;
 
         static Matrix<T> * eye(int row, int col, MATRIX_TYPE type){
             if (row <= 0 || col <= 0) {
