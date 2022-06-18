@@ -144,8 +144,6 @@ namespace mat {
 
         void slice(int row1, int row2, int col1, int col2);
 
-        Matrix<T> &convolve(BasicMatrix<T> &, int stride = 1, int padding = 0);
-
         Matrix<T> &convolve(SparseMatrix<T> &, int stride = 1, int padding = 0);
 
         void exponent(int exp);
@@ -615,10 +613,6 @@ namespace mat {
                 tri_map.erase(it++);
             }
         }
-    }
-
-    template<class T>
-    Matrix<T> &SparseMatrix<T>::convolve(BasicMatrix<T> &, int stride, int padding) {
     }
 
     template<class T>

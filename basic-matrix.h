@@ -128,8 +128,6 @@ class BasicMatrix : public Matrix<T> {
 
     Matrix<T> &convolve(BasicMatrix<T> &, int stride = 1, int padding = 0);
 
-    Matrix<T> &convolve(SparseMatrix<T> &, int stride = 1, int padding = 0);
-
     void exponent(int exp);
 
     void show();
@@ -898,10 +896,6 @@ Matrix<T> &BasicMatrix<T>::convolve(BasicMatrix<T> &right, int stride, int paddi
     BasicMatrix<T> rev(right); rev.reverse();
 
     // TODO:
-}
-
-template <class T>
-Matrix<T> &BasicMatrix<T>::convolve(SparseMatrix<T> &, int stride, int padding) {
 }
 
 template <class T>
