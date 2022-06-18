@@ -42,6 +42,9 @@ int main() {
     BasicMatrix<int> bm1(3, 2);
     BasicMatrix<int> bm2(3, 2);
     BasicMatrix<int> rm(1, 2);
+
+    rm.show();
+
     m = &bm1;
     cout<<bm1.getCol()<<endl;
     cout<<m->getCol()<<endl;

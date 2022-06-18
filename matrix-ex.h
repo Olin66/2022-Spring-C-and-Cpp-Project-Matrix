@@ -65,18 +65,10 @@ namespace mat {
             MismatchedSizeException(const Matrix<T> &l_mat, const Matrix<T> &r_mat, std::string message): l_row(l_mat.getRow()), l_col(l_mat.getCol()), r_row(r_mat.getRow()), r_col(r_mat.getCol()){};
 
             template<class T>
-            MismatchedSizeException(const BasicMatrix<T> &l_mat, const BasicMatrix<T> &r_mat, std::string message) {
-                const Matrix<T>& l = l_mat;
-                const Matrix<T>& r = r_mat;
-                MismatchedSizeException(l, r, message);
-            }
+            MismatchedSizeException(const BasicMatrix<T> &l_mat, const BasicMatrix<T> &r_mat, std::string message):l_row(l_mat.getRow()), l_col(l_mat.getCol()), r_row(r_mat.getRow()), r_col(r_mat.getCol()){};
 
             template<class T>
-            MismatchedSizeException(const SparseMatrix<T> &l_mat, const SparseMatrix<T> &r_mat, std::string message) {
-                const Matrix<T>& l = l_mat;
-                const Matrix<T>& r = r_mat;
-                MismatchedSizeException(l, r, message);
-            }
+            MismatchedSizeException(const SparseMatrix<T> &l_mat, const SparseMatrix<T> &r_mat, std::string message):l_row(l_mat.getRow()), l_col(l_mat.getCol()), r_row(r_mat.getRow()), r_col(r_mat.getCol()){};
 
             const char *what() override {
                 return (new std::string("The matrix exception occurs when doing " + operation + "\nThe sizes " +
@@ -94,9 +86,7 @@ namespace mat {
             template<class T>
             NotSquareException(const BasicMatrix<T> &mat,std::string message):row(mat.getRow()),col(mat.getCol()),operation(message){};
              const char *what() override {
-                return (new std::string("The matrix exception occurs when doing " + operation + "\nThe matrix is not square " 
-                             
-                                       ))->c_str();
+                return (new std::string("The matrix exception occurs when " + operation + "\nThe matrix is not square!"))->c_str();
             }
         };
         class NoInverseException :public MatrixException{
@@ -108,7 +98,7 @@ namespace mat {
             template<class T>
             NoInverseException(const BasicMatrix<T> &mat,std::string message):row(mat.getRow()),col(mat.getCol()),operation(message){};
             const char *what() override {
-                return (new std::string("The matrix exception occurs when doing " + operation + "\nThe matrix dose not have inverse. " 
+                return (new std::string("The matrix exception occurs when doing " + operation + "\nThe matrix does not have inverse!" 
                                        ))->c_str();
             }
         };

@@ -11,6 +11,12 @@
 #include<complex>
 using namespace std;
 namespace mat {
+
+#define MATRIX_TYPE int
+#define ZERO_MATRIX 0
+#define ONE_MATRIX 1
+#define EYE_MATRIX 2
+
  namespace ex {
         class MatrixException;
         class MismatchedSizeException;
@@ -32,7 +38,7 @@ class BasicMatrix : public Matrix<T> {
     T *m_data;
 
   public:
-    BasicMatrix(int, int);
+    BasicMatrix(int, int, MATRIX_TYPE=0);
 
     BasicMatrix(int, int, T *);
 
@@ -150,9 +156,18 @@ class BasicMatrix : public Matrix<T> {
 };
 
 template <class T>
-BasicMatrix<T>::BasicMatrix(int row, int col) : Matrix<T>(row, col) {
+BasicMatrix<T>::BasicMatrix(int row, int col, MATRIX_TYPE type) : Matrix<T>(row, col) {
     this->m_data = new T[this->getSize()];
-    std::memset(m_data, 0, sizeof(T) * this->getSize());
+    if (type == 0) std::memset(m_data, 0, sizeof(T) * this->getSize());
+    else if (type==1) std::memset(m_data, 1, sizeof(T) * this->getSize());
+    else {
+        if (row != col) throw ex::NotSquareException(row, col, "creating the identity matrix");
+        else {
+            std::memset(m_data, 0, sizeof(T) * this->getSize());
+            for (size_t i = 0; i < this->getCol(); i++)
+                setByIndex(i, i, 1);
+        }
+    }
 }
 
 template <class T>
@@ -500,7 +515,7 @@ T BasicMatrix<T>::getAvg() {
 template <class T>
 bool BasicMatrix<T>::getEigenvalue(int LoopNumber, double error, BasicMatrix<T> &result) {
     if (this->col != this->row) {
-        throw ex::NotSquareException(this->row, this->col, "eigen value");
+        throw ex::NotSquareException(this->row, this->col, "getting the eigenvalue");
     }
     int i;
     int j;
@@ -777,7 +792,7 @@ BasicMatrix<T>& BasicMatrix<T>::getEigenvector(BasicMatrix<T> &eigenvector) {
 template <class T>
 T BasicMatrix<T>::getTrace() {
     if (this->col != this->row) {
-        throw ex::NotSquareException(*this, "matrix trace");
+        throw ex::NotSquareException(*this, "getting the trace");
     }
     T trace = 0;
     for (int i = 0; i < this->col; i++) {
@@ -789,7 +804,7 @@ T BasicMatrix<T>::getTrace() {
 template <class T>
 T BasicMatrix<T>::getDeterminant() {
     if (this->col != this->row) {
-        throw ex::NotSquareException(*this, "matrix determinant");
+        throw ex::NotSquareException(*this, "getting the determinant");
     }
     T det = 0;
     if (this->col == 1) {
@@ -905,7 +920,7 @@ void BasicMatrix<T>::slice(int row1, int row2, int col1, int col2) {
 template <class T>
 Matrix<T> &BasicMatrix<T>::convolve(BasicMatrix<T> &right, int stride, int padding) {
     if (right.row == right.col) {
-        throw ex::NotSquareException(right, "matrix convolve");
+        throw ex::NotSquareException(right, "doing matrix convolution");
     }
     int r = (this->row - right.row + 2 * padding) / stride + 1;
     int c = (this->col - right.col + 2 * padding) / stride + 1;
