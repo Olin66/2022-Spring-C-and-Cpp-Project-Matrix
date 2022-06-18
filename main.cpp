@@ -15,6 +15,7 @@ int main() {
     matrix_cross_product();
     //matrix_convolution();
     return 0;
+
     Matrix<int> *m;
     BasicMatrix<int> bm1(3, 2);
     BasicMatrix<int> bm2(3, 2);
@@ -129,7 +130,7 @@ void matrix_cross_product() {
     BASIC_MATRIX_INT bm2(2, 3, _data);
     bm1.show();
     bm2.show();
-    bm1.crossProduct(bm2);
+    bm1.crossProduct(bm2); 
     bm1.show();
     cout << endl;
 }

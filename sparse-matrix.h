@@ -355,19 +355,19 @@ namespace mat {
 
     template<class T>
     void SparseMatrix<T>::crossProduct(const SparseMatrix<T> &right) {
-        if (this->col != right.col) {
+         if (this->col != right.row) {
             throw ex::MismatchedSizeException(*this, right, "matrix cross product");
         }
         int r = this->row;
         int c = right.col;
         SparseMatrix<T> mat(r, c);
         for (auto i = this->tri_map.begin(); i != this->tri_map.end(); i++) {
-            Triple<T> *l_point = i->second;
+            Triple<T> *tri = i->second;
             for (auto j = right.tri_map.begin(); j != right.tri_map.end(); j++) {
-                Triple<T> *r_point = j->second;
-                if (l_point->_col == r_point->_row) {
-                    mat.setByIndex(l_point->_row, r_point->_col,
-                                   mat.getByIndex(l_point->_row, r_point->_col) + l_point->val * r_point->val);
+                Triple<T> *trj = j->second;
+                if (tri->_col == trj->_row) {
+                    std::cout << tri->_row << " " << trj->_col << " " << tri->val << " " << trj->val << std::endl;
+                    mat.setByIndex(tri->_row, trj->_col, mat.getByIndex(tri->_row, trj->_col) + tri->val * trj->val);
                 }
             }
         }
