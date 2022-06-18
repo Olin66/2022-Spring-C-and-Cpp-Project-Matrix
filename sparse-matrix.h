@@ -370,7 +370,13 @@ namespace mat {
 
     template<class T>
     void SparseMatrix<T>::reverse() {
-        
+        int _size = this->size;
+        std::map<int , Triple<T>*> _map;
+        for (auto it = this->tri_map.begin(); it != this->tri_map.end(); it++) {
+            int index = it->first;
+            Triple<T> *tri = it->second;
+            _map[_size - index - 1] = new Triple<T>(this->row - tri->_row - 1, this->col - tri->_col - 1, tri->val);
+        }
     }
 
     template<class T>
@@ -570,7 +576,15 @@ namespace mat {
     }
 
     template<class T>
-    Matrix<T> &SparseMatrix<T>::convolve(SparseMatrix<T> &, int stride, int padding) {
+    Matrix<T> &SparseMatrix<T>::convolve(SparseMatrix<T> &right, int stride, int padding) {
+        if (right.row == right.col) {
+            throw ex::NotSquareException(right, "doing matrix convolution");
+        }
+        int r = (this->row - right.row + 2 * padding) / stride + 1;
+        int c = (this->col - right.col + 2 * padding) / stride + 1;
+        SparseMatrix<T> mat(r, c);
+        SparseMatrix<T> rev(right); rev.reverse();
+        return mat;
     }
 
     template<class T>

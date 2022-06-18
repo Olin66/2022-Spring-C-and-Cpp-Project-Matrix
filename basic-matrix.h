@@ -923,7 +923,7 @@ void BasicMatrix<T>::slice(int row1, int row2, int col1, int col2) {
 
 template <class T>
 Matrix<T> &BasicMatrix<T>::convolve(BasicMatrix<T> &right, int stride, int padding) {
-    if (right.row == right.col) {
+    if (right.row != right.col) {
         throw ex::NotSquareException(right, "doing matrix convolution");
     }
     int r = (this->row - right.row + 2 * padding) / stride + 1;
@@ -931,7 +931,17 @@ Matrix<T> &BasicMatrix<T>::convolve(BasicMatrix<T> &right, int stride, int paddi
     BasicMatrix<T> mat(r, c);
     BasicMatrix<T> rev(right); rev.reverse();
 
-    // TODO:
+    BasicMatrix<T> ext(this->row + 2 * padding, this->col + 2 * padding);
+    for (int i = 0; i < r; i++) {
+        for (int j = 0; j < c; j++) {
+            for (int k = 0; k < rev.row; k++) {
+                for (int t = 0; t < rev.col; t++) {
+                    mat.setByIndex(i, j, mat.getByIndex(i, j) + rev.getByIndex(k, t) * ext.getByIndex(k+i, t+j));
+                }
+            }
+        }
+    }
+    return mat;
 }
 
 template <class T>

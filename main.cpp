@@ -6,38 +6,12 @@
 #define SPARSE_MATRIX_INT SparseMatrix<int>
 using namespace std;
 using namespace mat;
-
-void matrix_dot_product() {
-    const int TEST_SIZE = 6;
-    int *_data = new int[TEST_SIZE]{1,2,3,4,5,6};
-    BASIC_MATRIX_INT bm1(3, 2, _data);
-    BASIC_MATRIX_INT bm2(3, 2, _data);
-    bm1.show();
-    bm1.add(bm2);
-    bm1.show();
-    bm1.dotProduct(bm2);
-    bm1.show();
-    int *_data1 = new int[TEST_SIZE/2]{1,2,3};
-    BASIC_MATRIX_INT bm3(3, 1, _data1);
-    bm3.show();
-    bm2.show();
-    bm3.dotProduct(bm2);
-    bm3.show();
-}
-
-void matrix_cross_product() {
-    const int TEST_SIZE = 6;
-    int *_data = new int[TEST_SIZE]{1,2,3,4,5,6};
-    BASIC_MATRIX_INT bm1(3, 2, _data);
-    BASIC_MATRIX_INT bm2(2, 3, _data);
-    bm1.show();
-    bm2.show();
-    bm1.crossProduct(bm2);
-    bm1.show();
-}
+void matrix_dot_product();
+void matrix_cross_poduct();
+void matrix_convolution();
 int main() {
-    // matrix_cross_product();
-    // return 0;
+    matrix_convolution();
+    return 0;
     Matrix<int> *m;
     BasicMatrix<int> bm1(3, 2);
     BasicMatrix<int> bm2(3, 2);
@@ -84,8 +58,6 @@ int main() {
     //     cout<<mm.getData()[i]<<endl;;
     // }
     
-
-    SparseMatrix<int> sm1(v);
     // sm1.show();
 
     cout<<endl;
@@ -107,4 +79,53 @@ int main() {
 
     BasicMatrix<int> m4(2, 2, 100);
     m4.show();
+}
+
+void matrix_dot_product() {
+    const int TEST_SIZE = 6;
+    int *_data = new int[TEST_SIZE]{1,2,3,4,5,6};
+    BASIC_MATRIX_INT bm1(3, 2, _data);
+    BASIC_MATRIX_INT bm2(3, 2, _data);
+    bm1.show();
+    bm1.add(bm2);
+    bm1.show();
+    bm1.dotProduct(bm2);
+    bm1.show();
+    int *_data1 = new int[TEST_SIZE/2]{1,2,3};
+    BASIC_MATRIX_INT bm3(3, 1, _data1);
+    bm3.show();
+    bm2.show();
+    bm3.dotProduct(bm2);
+    bm3.show();
+}
+
+void matrix_cross_product() {
+    const int TEST_SIZE = 6;
+    int *_data = new int[TEST_SIZE]{1,2,3,4,5,6};
+    BASIC_MATRIX_INT bm1(3, 2, _data);
+    BASIC_MATRIX_INT bm2(2, 3, _data);
+    bm1.show();
+    bm2.show();
+    bm1.crossProduct(bm2);
+    bm1.show();
+}
+
+void matrix_convolution() {
+    const int TEST_SIZE = 16;
+    int *_data1 = new int[TEST_SIZE]{
+        1, 2, 3, 4,
+        5, 6, 7, 8,
+        9, 10, 11, 12,
+        13, 14, 15, 16};
+    BASIC_MATRIX_INT bm1(4, 4, _data1);
+
+    int *_data2 = new int[9]{
+        -1, -2, -1,
+        0, 0, 0,
+        1, 2, 1};
+    BASIC_MATRIX_INT bm2(3, 3, _data2);
+    bm1.show();
+    bm2.show();
+    Matrix<int> &mat_ans = bm1.convolve(bm2);
+    mat_ans.show();
 }
