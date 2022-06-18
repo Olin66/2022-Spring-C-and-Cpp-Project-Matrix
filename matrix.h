@@ -139,9 +139,9 @@ namespace mat {
 
         virtual void slice(int row1, int row2, int col1, int col2) = 0;
 
-        virtual BasicMatrix<T> &convolve(BasicMatrix<T> &, int stride = 1, int padding = 0) = 0;
+        virtual BasicMatrix<T>* convolve(BasicMatrix<T> &, int stride = 1, int padding = 0) = 0;
 
-        virtual SparseMatrix<T> &convolve(SparseMatrix<T> &, int stride = 1, int padding = 0) = 0;
+        virtual SparseMatrix<T>* convolve(SparseMatrix<T> &, int stride = 1, int padding = 0) = 0;
 
         virtual void exponent(int) = 0;
 

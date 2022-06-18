@@ -52,7 +52,6 @@ namespace mat {
     template<class T>
     class SparseMatrix : public Matrix<T> {
     private:
-        long size;
         std::map<int, Triple<T>*> tri_map;
     public:
         SparseMatrix(int, int);
@@ -145,9 +144,9 @@ namespace mat {
 
         void slice(int row1, int row2, int col1, int col2);
 
-        BasicMatrix<T> &convolve(BasicMatrix<T> &, int stride = 1, int padding = 0);
+        BasicMatrix<T>* convolve(BasicMatrix<T> &, int stride = 1, int padding = 0);
 
-        SparseMatrix<T> &convolve(SparseMatrix<T> &, int stride = 1, int padding = 0);
+        SparseMatrix<T>* convolve(SparseMatrix<T> &, int stride = 1, int padding = 0);
 
         void exponent(int exp);
 
@@ -346,7 +345,7 @@ namespace mat {
         int r = right.row;
         int c = right.col;
         if (this->col == 1) {
-            SparseMatrix<T> mat(r, 1);
+            SparseMatrix<T> mat(r, c);
             for (auto i = this->tri_map.begin(); i != this->tri_map.end(); i++) {
                 for (auto j = right.tri_map.begin(); j != right.tri_map.end(); j++) {
                     Triple<T>* LP = i->second;
@@ -380,18 +379,19 @@ namespace mat {
 
     template<class T>
     void SparseMatrix<T>::crossProduct(const SparseMatrix<T> &right) {
-        if (this->col != right.col) {
+        if (this->col != right.row) {
             throw ex::MismatchedSizeException(*this, right, "matrix cross product");
         }
         int r = this->row;
         int c = right.col;
         SparseMatrix<T> mat(r, c);
         for (auto i = this->tri_map.begin(); i != this->tri_map.end(); i++) {
-            Triple<T> *l_point = i->second;
+            Triple<T> *tri = i->second;
             for (auto j = right.tri_map.begin(); j != right.tri_map.end(); j++) {
-                Triple<T> *r_point = j->second;
-                if (l_point->_col == r_point->_row) {
-                    mat.setByIndex(l_point->_row, r_point->_col, mat.getByIndex(l_point->_row, r_point->_col) + l_point->val * r_point->val);
+                Triple<T> *trj = j->second;
+                if (tri->_col == trj->_row) {
+                    std::cout << tri->_row << " " << trj->_col << " " << tri->val << " " << trj->val << std::endl;
+                    mat.setByIndex(tri->_row, trj->_col, mat.getByIndex(tri->_row, trj->_col) + tri->val * trj->val);
                 }
             }
         }
@@ -410,13 +410,14 @@ namespace mat {
 
     template<class T>
     void SparseMatrix<T>::reverse() {
-        int _size = this->size;
+        int _size = this->getSize();
         std::map<int , Triple<T>*> _map;
         for (auto it = this->tri_map.begin(); it != this->tri_map.end(); it++) {
             int index = it->first;
             Triple<T> *tri = it->second;
             _map[_size - index - 1] = new Triple<T>(this->row - tri->_row - 1, this->col - tri->_col - 1, tri->val);
         }
+        this->tri_map = _map;
     }
 
     template<class T>
@@ -634,18 +635,36 @@ namespace mat {
     }
 
     template<class T>
-    BasicMatrix<T> &SparseMatrix<T>::convolve(BasicMatrix<T> &, int stride, int padding) {
+    BasicMatrix<T>* SparseMatrix<T>::convolve(BasicMatrix<T> &, int stride, int padding) {
     }
 
     template<class T>
-    SparseMatrix<T> &SparseMatrix<T>::convolve(SparseMatrix<T> &right, int stride, int padding) {
-        if (right.row == right.col) {
+    SparseMatrix<T>* SparseMatrix<T>::convolve(SparseMatrix<T> &right, int stride, int padding) {
+        if (right.row != right.col) {
             throw ex::NotSquareException(right, "doing matrix convolution");
         }
         int r = (this->row - right.row + 2 * padding) / stride + 1;
         int c = (this->col - right.col + 2 * padding) / stride + 1;
-        SparseMatrix<T> mat(r, c);
+        SparseMatrix<T> *mat = new SparseMatrix<T>(r, c);
         SparseMatrix<T> rev(right); rev.reverse();
+
+        SparseMatrix<T> ext(this->row + 2 * padding, this->col + 2 * padding);
+        for (auto it = this->tri_map.begin(); it != this->tri_map.end(); it++) {
+            Triple<T> *tri = it->second;
+            ext.setByIndex(tri->_row+padding, tri->_col+padding, this->getByIndex(tri->_row, tri->_col));
+        }
+
+        for (auto i = rev.tri_map.begin(); i != rev.tri_map.end(); i++) {
+            for (auto j = ext.tri_map.begin(); j != ext.tri_map.end(); j++) {
+                Triple<T> *tri = i->second;
+                Triple<T> *trj = j->second;
+                int _r = trj->_row - tri->_row;
+                int _c = trj->_col - tri->_col;
+                if (0 <= _r && _r < r && 0 <= _c && _c < c) {
+                    mat->setByIndex(_r, _c, mat->getByIndex(_r, _c) + tri->val * trj->val);
+                }
+            }
+        }
         return mat;
     }
 
@@ -676,6 +695,7 @@ namespace mat {
             }
             cout<<endl;
         }
+        cout << endl;
     }
 }
 

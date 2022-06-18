@@ -131,9 +131,9 @@ class BasicMatrix : public Matrix<T> {
 
     void slice(int row1, int row2, int col1, int col2);
 
-    BasicMatrix<T> &convolve(BasicMatrix<T> &, int stride = 1, int padding = 0);
+    BasicMatrix<T>* convolve(BasicMatrix<T> &, int stride = 1, int padding = 0);
 
-    SparseMatrix<T> &convolve(SparseMatrix<T> &, int stride = 1, int padding = 0);
+    SparseMatrix<T>* convolve(SparseMatrix<T> &, int stride = 1, int padding = 0);
 
     void exponent(int exp);
 
@@ -924,7 +924,7 @@ void BasicMatrix<T>::slice(int row1, int row2, int col1, int col2) {
 }
 
 template <class T>
-BasicMatrix<T> &BasicMatrix<T>::convolve(BasicMatrix<T> &right, int stride, int padding) {
+BasicMatrix<T>* BasicMatrix<T>::convolve(BasicMatrix<T> &right, int stride, int padding) {
     if (right.row != right.col) {
         throw ex::NotSquareException(right, "doing matrix convolution");
     }
@@ -932,7 +932,6 @@ BasicMatrix<T> &BasicMatrix<T>::convolve(BasicMatrix<T> &right, int stride, int 
     int c = (this->col - right.col + 2 * padding) / stride + 1;
     BasicMatrix<T> mat(r, c);
     BasicMatrix<T> rev(right); rev.reverse();
-    rev.show();
 
     BasicMatrix<T> ext(this->row + 2 * padding, this->col + 2 * padding);
     for (int i = 0; i < this->row; i++) {
@@ -954,7 +953,7 @@ BasicMatrix<T> &BasicMatrix<T>::convolve(BasicMatrix<T> &right, int stride, int 
 }
 
 template <class T>
-SparseMatrix<T> &BasicMatrix<T>::convolve(SparseMatrix<T> &, int stride, int padding) {
+SparseMatrix<T>* BasicMatrix<T>::convolve(SparseMatrix<T> &, int stride, int padding) {
 }
 
 template <class T>
