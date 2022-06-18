@@ -4,7 +4,7 @@
 #include "matrix.h"
 #include "basic-matrix.h"
 #include "matrix-ex.h"
-#include <opencv2/opencv.hpp>
+// #include <opencv2/opencv.hpp>
 #include <cstring>
 #include <iostream>
 #include <cmath>
@@ -13,7 +13,7 @@
 #include <set>
 #include <map>
 using namespace std;
-using namespace cv;
+// using namespace cv;
 namespace mat {
     namespace ex {
         class MatrixException;
@@ -65,7 +65,7 @@ namespace mat {
     public:
         SparseMatrix(int, int);
 
-        SparseMatrix(const cv::Mat &mat);
+        // SparseMatrix(const cv::Mat &mat);
 
         SparseMatrix(vector<vector<T>>);
 
@@ -159,37 +159,37 @@ namespace mat {
 
         void show();
 
-        cv::Mat* getCvMat();
+        // cv::Mat* getCvMat();
     };
 
-    template<class T>
-    Mat* SparseMatrix<T>::getCvMat(){
-        Mat* mat = new Mat(this->getRow(), this->getCol(), CV_8UC1);
-        for (auto it = tri_map.begin(); it != tri_map.end(); it++)
-        {
-            auto tri = it->second;
-            double re = real(getByIndex(tri->_row, tri->_col));
-            mat->at<double>(tri->_row, tri->_col) = re;
-        }
-        return mat;
-    }
+    // template<class T>
+    // Mat* SparseMatrix<T>::getCvMat(){
+    //     Mat* mat = new Mat(this->getRow(), this->getCol(), CV_8UC1);
+    //     for (auto it = tri_map.begin(); it != tri_map.end(); it++)
+    //     {
+    //         auto tri = it->second;
+    //         double re = real(getByIndex(tri->_row, tri->_col));
+    //         mat->at<double>(tri->_row, tri->_col) = re;
+    //     }
+    //     return mat;
+    // }
 
     template<class T>
     SparseMatrix<T>::SparseMatrix(int row, int col): Matrix<T>(row, col) {}
 
-    template<class T>
-    SparseMatrix<T>::SparseMatrix(const cv::Mat &mat): Matrix<T>(mat) {
-        if (mat.channels() != 1)
-            throw ex::InvalidChannelDepth(mat.channels());
-        for (size_t i = 0; i < this->getRow(); i++)
-        {
-            for (size_t j = 0; j < this->getCol(); j++)
-            {
-                if ((T)mat.at<uchar>(i,j) != 0)
-                    setByIndex(i, j, (T)mat.at<uchar>(i,j));
-            }
-        }
-    }
+    // template<class T>
+    // SparseMatrix<T>::SparseMatrix(const cv::Mat &mat): Matrix<T>(mat) {
+    //     if (mat.channels() != 1)
+    //         throw ex::InvalidChannelDepth(mat.channels());
+    //     for (size_t i = 0; i < this->getRow(); i++)
+    //     {
+    //         for (size_t j = 0; j < this->getCol(); j++)
+    //         {
+    //             if ((T)mat.at<uchar>(i,j) != 0)
+    //                 setByIndex(i, j, (T)mat.at<uchar>(i,j));
+    //         }
+    //     }
+    // }
 
     template<class T>
     SparseMatrix<T>::SparseMatrix(vector<vector<T>> mat): Matrix<T>(mat.size(), mat[0].size()) {

@@ -2,116 +2,117 @@
 #include <vector>
 #include "matrix.h"
 #include "basic-matrix.h"
+//  #include <opencv2/opencv.hpp>
 #define BASIC_MATRIX_INT SparseMatrix<int>//BasicMatrix<int>
 #define SPARSE_MATRIX_INT SparseMatrix<int>
 using namespace std;
 using namespace mat;
-using namespace cv;
+// using namespace cv;
 void matrix_dot_product();
 void matrix_cross_product();
 void matrix_convolution();
 
 int main() {
-    // matrix_dot_product();
-    // matrix_cross_product();
-    // //matrix_convolution();
-    // return 0;
+//     // matrix_dot_product();
+//     // matrix_cross_product();
+//     // //matrix_convolution();
+//     // return 0;
 
-    Matrix<int> *m;
-    BasicMatrix<int> bm1(3, 2);
-    BasicMatrix<int> bm2(3, 2);
-    BasicMatrix<int> rm(1, 2);
+//     Matrix<int> *m;
+//     BasicMatrix<int> bm1(3, 2);
+//     BasicMatrix<int> bm2(3, 2);
+//     BasicMatrix<int> rm(1, 2);
 
-    rm.show();
+//     rm.show();
 
-    m = &bm1;
-    cout<<bm1.getCol()<<endl;
-    cout<<m->getCol()<<endl;
+//     m = &bm1;
+//     cout<<bm1.getCol()<<endl;
+//     cout<<m->getCol()<<endl;
 
-//    cout << bm.getData()[1] << endl;
-//    cout << bm.getData()[2] << endl;
-//    cout << bm.getData()[3] << endl;
-//    cout << bm.getData()[4] << endl;
-//    cout << bm.getData()[5] << endl;
+// //    cout << bm.getData()[1] << endl;
+// //    cout << bm.getData()[2] << endl;
+// //    cout << bm.getData()[3] << endl;
+// //    cout << bm.getData()[4] << endl;
+// //    cout << bm.getData()[5] << endl;
 
-    vector<vector<int>> v(3, vector<int>(2));
-    v[0][1] = 5;
-    v[2][1] = 6;
-    v[1][1] = 1;
-    v[0][0] = 3;
-    BasicMatrix<int> qm(v);
-    cout<<qm.getSize()<<endl;
+//     vector<vector<int>> v(3, vector<int>(2));
+//     v[0][1] = 5;
+//     v[2][1] = 6;
+//     v[1][1] = 1;
+//     v[0][0] = 3;
+//     BasicMatrix<int> qm(v);
+//     cout<<qm.getSize()<<endl;
 
-    try {
-        bm1.add(rm);
-    }catch (ex::MismatchedSizeException& e){
-        cout<<e.what()<<endl;
-    }
+//     try {
+//         bm1.add(rm);
+//     }catch (ex::MismatchedSizeException& e){
+//         cout<<e.what()<<endl;
+//     }
 
-    bm1.add(qm);
+//     bm1.add(qm);
 
-    BasicMatrix<int> bm3 = bm1 + qm;
+//     BasicMatrix<int> bm3 = bm1 + qm;
 
-    bm3.show();
+//     bm3.show();
 
-    BasicMatrix<int> mm(bm1);
+//     BasicMatrix<int> mm(bm1);
 
-    // BasicMatrix<int> a = bm * qm;
+//     // BasicMatrix<int> a = bm * qm;
 
-    // for (int i = 0; i < bm1.getSize(); i++)
-    // {
-    //     cout<<mm.getData()[i]<<endl;;
-    // }
+//     // for (int i = 0; i < bm1.getSize(); i++)
+//     // {
+//     //     cout<<mm.getData()[i]<<endl;;
+//     // }
     
-    // sm1.show();
+//     // sm1.show();
 
-    cout<<endl;
-    cout<<endl;
-    cout<<endl;
-    cout<<endl;
-    BasicMatrix<int> m1(v);
-    m1.show();
-    BasicMatrix<int> m2(v);
-    BasicMatrix<int> m3 = m1 + m2;
-    m3.show();
+//     cout<<endl;
+//     cout<<endl;
+//     cout<<endl;
+//     cout<<endl;
+//     BasicMatrix<int> m1(v);
+//     m1.show();
+//     BasicMatrix<int> m2(v);
+//     BasicMatrix<int> m3 = m1 + m2;
+//     m3.show();
 
-    m3 = m3 * 2;
+//     m3 = m3 * 2;
 
-    m3.show();
+//     m3.show();
 
-    m3 = 2 * m3;
-    m3.show();
+//     m3 = 2 * m3;
+//     m3.show();
 
-    BasicMatrix<int> m4(2, 2, 100);
-    m4.show();
+//     BasicMatrix<int> m4(2, 2, 100);
+//     m4.show();
 
-    vector<Triple<int>> v3;
-    v3.push_back(Triple<int>(1, 1, 4));
-    v3.push_back(Triple<int>(1, 0, 1));
-    // v3.push_back(Triple<int>(1, 1, 2));
-    // v3.push_back(Triple<int>(2, 2, 4));
-    SparseMatrix<int> sm2(2, 2, v3);
-    sm2.show();
-    SparseMatrix<int> sm3(sm2);
-    // cout<<sm3.getTriples()[3]->_row<<endl;
-    // cout<<sm3.getTriples()[3]->_col<<endl;
-    // cout<<sm3.getTriples()[3]->val<<endl;
-    sm3.show();
+//     vector<Triple<int>> v3;
+//     v3.push_back(Triple<int>(1, 1, 4));
+//     v3.push_back(Triple<int>(1, 0, 1));
+//     // v3.push_back(Triple<int>(1, 1, 2));
+//     // v3.push_back(Triple<int>(2, 2, 4));
+//     SparseMatrix<int> sm2(2, 2, v3);
+//     sm2.show();
+//     SparseMatrix<int> sm3(sm2);
+//     // cout<<sm3.getTriples()[3]->_row<<endl;
+//     // cout<<sm3.getTriples()[3]->_col<<endl;
+//     // cout<<sm3.getTriples()[3]->val<<endl;
+//     sm3.show();
 
-    SparseMatrix<int> sm4(2, 2);
-    sm4 = sm3;
-    sm4.show();
+//     SparseMatrix<int> sm4(2, 2);
+//     sm4 = sm3;
+//     sm4.show();
 
-    Mat mat1(5, 5, CV_8UC1);
-    BasicMatrix<int> mmm1(mat1);
-    Mat mat2 = imread("./img/conan1.png");
-    Mat grey;
-    cvtColor(mat2,grey,CV_BGR2GRAY);
-    // imshow("grey",grey);
-	BasicMatrix<int> mm2(grey);
-    // mm2.show();
-    SparseMatrix<int> mm3(grey);
-    mm3.show();
+//     Mat mat1(5, 5, CV_8UC1);
+//     BasicMatrix<int> mmm1(mat1);
+//     Mat mat2 = imread("./img/conan1.png");
+//     Mat grey;
+//     cvtColor(mat2,grey,CV_BGR2GRAY);
+//     // imshow("grey",grey);
+// 	BasicMatrix<int> mm2(grey);
+//     // mm2.show();
+//     SparseMatrix<int> mm3(grey);
+//     mm3.show();
 }
 
 void matrix_dot_product() {
