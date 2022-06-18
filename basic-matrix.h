@@ -13,11 +13,6 @@
 using namespace std;
 // using namespace cv;
 namespace mat {
-
-#define ZERO_MATRIX 0
-#define ONE_MATRIX 1
-#define EYE_MATRIX 2
-
     namespace ex {
         class MatrixException;
         class MismatchedSizeException;
