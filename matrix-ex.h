@@ -119,6 +119,8 @@ namespace mat {
                 NoInverseException(int row, int col, std::string message):row(row),col(col),operation(message){};
             template<class T>
             NoInverseException(const BasicMatrix<T> &mat,std::string message):row(mat.getRow()),col(mat.getCol()),operation(message){};
+            template<class T>
+            NoInverseException(const SparseMatrix<T> &mat,std::string message):row(mat.getRow()),col(mat.getCol()),operation(message){};
             const char *what() override {
                 return (new std::string("The matrix exception occurs when doing " + operation + "\nThe matrix does not have inverse!" 
                                        ))->c_str();

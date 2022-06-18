@@ -72,10 +72,8 @@ namespace mat {
         void reverse();
 
         void conjugate();
-
-        void Hessenberg();
-
-        T getByIndex(int, int) const;
+        
+    T getByIndex(int, int) const;
 
         void setByIndex(int, int, T);
 
@@ -103,17 +101,21 @@ namespace mat {
 
         T getColAvg(int);
 
-        bool getEigenvalue(int LoopNumber, double error, BasicMatrix<T> &result);
+    void Gaussian_Eliminate(BasicMatrix<T>&ans,BasicMatrix<T>&eigenmatirx);
 
-        BasicMatrix<T> &getEigenvector(BasicMatrix<T>&eigenvector);
+    bool getEigenvalue(int LoopNumber,  BasicMatrix<T> &result);
 
-        bool getEigen(BasicMatrix<T> &eigenvector, BasicMatrix<T> &eigenvalue, double error, double iterator);//雅克比法计算特征值和特征向量
+    void QR(BasicMatrix<T>&Q,BasicMatrix<T>&R);
+
+    BasicMatrix<T> &getEigenvector(BasicMatrix<T> &eigenvector,const T lamda);
 
         T getTrace();
 
         T getDeterminant();
 
-        void reshape(int row, int col);
+    bool getEigen(BasicMatrix<T> &eigenvector, BasicMatrix<T> &eigenvalue, double error, double iterator);//雅克比法计算特征值和特征向量
+
+    void reshape(int row, int col);
 
         void loop(T[]);
 
@@ -153,11 +155,11 @@ namespace mat {
         Mat* mat = new Mat(this->getRow(), this->getCol(), CV_8UC1);
         for (size_t i = 0; i < this->getRow(); i++)
         {
-           for (size_t j = 0; j < this->getCol(); j++)
-           {
+            for (size_t j = 0; j < this->getCol(); j++)
+            {
                 double re = real(getByIndex(i, j));
                 mat->at<double>(i, j) = re;
-           }
+            }
         }
         return mat;
     }
@@ -320,6 +322,52 @@ namespace mat {
     }
 
     template <class T>
+    void BasicMatrix<T>::Gaussian_Eliminate(BasicMatrix<T>&ans,BasicMatrix<T>&eigenmatirx){
+        T max;
+        short row;//每列的最大值及其行数
+        T temp[eigenmatirx.col];
+        for (int j = 0; j < eigenmatirx.col - 1; j++)//j为参考列
+        {
+            //找出列最大值及其行数
+            max = abs(eigenmatirx.getByIndex(j,j));
+            row = j;
+            for (int i = j+1; i < eigenmatirx.col; i++)
+            {
+                if (abs(eigenmatirx.getByIndex(i,j)) > max)
+                {
+                    max = abs(eigenmatirx.getByIndex(i,j));
+                    row = i;
+                }
+            }
+            //将最大值行与第一行交换
+            if (row != j)
+            {
+                for (int i = j; i < eigenmatirx.col; i++)
+                    temp[i] = eigenmatirx.getByIndex(row,i);
+                for (int i = j; i < eigenmatirx.col; i++)
+                    eigenmatirx.setByIndex(row,i,eigenmatirx.getByIndex(j,i));
+                for (int i = j; i < eigenmatirx.col; i++)
+                    eigenmatirx.setByIndex(j,i,temp[i]);
+            }
+            //开始按列消元,即每次将除最大值行以外的一列清零
+            for (int i = j + 1; i < eigenmatirx.col; i++)
+                for (int k = j + 1; k <eigenmatirx.col; k++)
+                    eigenmatirx.setByIndex(i,k,eigenmatirx.getByIndex(i,k)-eigenmatirx.getByIndex(i,j)/eigenmatirx.getByIndex(j,j)*eigenmatirx.getByIndex(j,k));
+
+        }
+        ans.setByIndex(eigenmatirx.col-1,0,1);
+        for (int i = eigenmatirx.col - 2; i >= 0; i--)
+        {
+            ans.setByIndex(i,0,0);
+            for (int j = eigenmatirx.row - 1; j > i; j--)
+                ans.setByIndex(i,0,ans.getByIndex(i,0)-eigenmatirx.getByIndex(i,j)*ans.getByIndex(0,j));
+            ans.setByIndex(i,0,ans.getByIndex(i,0)/eigenmatirx.getByIndex(i,i));
+
+        }
+    }
+
+
+    template <class T>
     void BasicMatrix<T>::transpose() {
         BasicMatrix<T> mat(this->col, this->row);
         for (int i = 0; i < this->row; i++) {
@@ -389,66 +437,6 @@ namespace mat {
 
     }
 
-
-    template <class T>
-    void BasicMatrix<T>::Hessenberg() { //求海森堡矩阵，上三角化
-        BasicMatrix<T> A(this->row, this->col);
-        int k;
-        int i;
-        int j;
-        int Max;
-        double temp;
-        for (i = 0; i < this->col; i++) {
-
-            for (j = 0; j < this->col; j++) {
-                A.setByIndex(i, j, this->getByIndex(i, j));
-            }
-        }
-        for (k = 1; k < this->col - 1; k++) {
-            i = k - 1;
-            Max = k;
-            temp = abs(A.getByIndex(k, i));
-            for (j = k + 1; j < this->col; j++) {
-                if (abs(A.getByIndex(j, i)) > temp) {
-                    temp = abs(A.getByIndex(j, i));
-                    Max = j;
-                }
-            }
-
-            this->setByIndex(0, 0, A.getByIndex(Max, i));
-            i = Max;
-            if (this->getByIndex(0, 0) != 0) {
-                if (i != k) {
-                    for (j = k - 1; j < this->col; j++) {
-                        temp = A.getByIndex(i, j);
-                        A.setByIndex(i, j, A.getByIndex(k, j));
-                        A.setByIndex(k, j, temp);
-                    }
-                    for (j = 0; j < this->col; j++) {
-                        temp = A.getByIndex(j, i);
-                        A.setByIndex(j, i, A.getByIndex(j, k));
-                        A.setByIndex(j, k, temp);
-                    }
-                }
-                for (i = k + 1; i < this->col; i++) {
-                    temp = A.getByIndex(i, k - 1) / this->getByIndex(0, 0);
-                    A.setByIndex(i, k - 1, 0);
-                    for (j = k; j < this->col; j++) {
-                        A.setByIndex(i, j, -temp * A.getByIndex(k, j));
-                    }
-                    for (j = 0; j < this->col; j++) {
-                        A.setByIndex(j, k, A.getByIndex(j, k) + temp * A.getByIndex(j, i));
-                    }
-                }
-            }
-        }
-        for (i = 0; i < this->col; i++) {
-
-            for (j = 0; j < this->col; j++) {
-                this->setByIndex(i, j, A.getByIndex(i, j));
-            }
-        }
-    }
     template <class T>
     T BasicMatrix<T>::getMax() {
         T max = getByIndex(0, 0);
@@ -495,172 +483,32 @@ namespace mat {
     }
 
     template <class T>
-    bool BasicMatrix<T>::getEigenvalue(int LoopNumber, double error, BasicMatrix<T> &result) {
-        if (this->col != this->row) {
-            throw ex::NotSquareException(this->row, this->col, "getting the eigenvalue");
-        }
-        int i;
-        int j;
-        int k;
-        int t;
-        int m;
-        int loop;
-        T b;
-        T c;
-        T d;
-        T g;
-        T xy;
-        T p;
-        T q;
-        T r;
-        T x;
-        T s;
-        T e;
-        T f;
-        T z;
-        T y;
-        T temp;
-        this->Hessenberg();
-        BasicMatrix<T> A(*this);
-        BasicMatrix<T> B(this->row, 2);
-        result = B;
-        m = this->getCol();
-        loop = LoopNumber;
-        while (m) {
-            t = m - 1;
-            while (t > 0) {
-                temp = abs(A.getByIndex(t - 1, t - 1));
-                temp += temp * error;
-                if (abs(A.getByIndex(t, t - 1)) > temp) {
-                    t--;
-                } else {
-                    break;
-                }
-            }
-            if (t == m - 1) {
-                result.setByIndex(m - 1, 0, A.getByIndex(m - 1, m - 1));
-                result.setByIndex(m - 1, 1, 0);
-                m -= 1;
-                loop = LoopNumber;
-            } else if (t == m - 2) {
-                b = -A.getByIndex(m - 1, m - 1) - A.getByIndex(m - 2, m - 2);
-                c = A.getByIndex(m - 1, m - 1) * A.getByIndex(m - 2, m - 2) - A.getByIndex(m - 1, m - 2) * A.getByIndex(m - 2, m - 1);
-                d = b * b - 4 * c;
-                y = sqrt(abs(d));
-                if (d > 0) {
-                    xy = 1;
-                    if (b < 0) {
-                        xy = -1;
-                    }
-                    result.setByIndex(m - 1, 0, -(b + xy * y) / 2);
-                    result.setByIndex(m - 1, 1, 0);
-                    result.setByIndex(m - 2, 0, c / result.getByIndex(m - 1, 0));
-                    result.setByIndex(m - 2, 1, 0);
-
-                } else {
-                    result.setByIndex(m - 1, 0, -b / 2);
-                    result.setByIndex(m - 2, 0, -b / 2);
-                    result.setByIndex(m - 1, 1, y / 2);
-                    result.setByIndex(m - 2, 1, -y / 2);
-                }
-                m -= 2;
-                loop = LoopNumber;
-
-            } else {
-                if (loop < 1) {
-                    cout << "no eigenvalue" << endl;
-                    return false;
-                }
-                loop--;
-                j = t + 2;
-                while (j < m) {
-                    A.setByIndex(j, j - 2, 0);
-                    j++;
-                }
-                j = t + 3;
-                while (j < m) {
-                    A.setByIndex(j, j - 3, 0);
-                    j++;
-                }
-                k = t;
-                while (k < m - 1) {
-                    if (k != t) {
-                        p = A.getByIndex(k, k - 1);
-                        q = A.getByIndex(k + 1, k - 1);
-                        if (k != m - 2) {
-                            r = A.getByIndex(k + 2, k - 1);
-                        } else {
-                            r = 0;
-                        }
-
-                    } else {
-                        b = A.getByIndex(m - 1, m - 1);
-                        c = A.getByIndex(m - 2, m - 2);
-                        x = b + c;
-                        y = b * c - A.getByIndex(m - 2, m - 1) * A.getByIndex(m - 1, m - 2);
-                        p = A.getByIndex(t, t) * (A.getByIndex(t, t) - x) + A.getByIndex(t, t + 1) * A.getByIndex(t + 1, t) + y;
-                        q = A.getByIndex(t + 1, t) * (A.getByIndex(t, t) + A.getByIndex(t + 1, t + 1) - x);
-                        r = A.getByIndex(t + 1, t) * A.getByIndex(t + 2, t + 1);
-                    }
-                    if (p != 0 || q != 0 || r != 0) {
-                        if (q < 0) {
-                            xy = -1;
-                        } else {
-                            xy = 1;
-                        }
-                        s = xy * sqrt(p * p + q * q + r * r);
-                        if (k != t) {
-                            A.setByIndex(k, k - 1, -s);
-                        }
-                        e = -q / s;
-                        f = -r / s;
-                        x = -p / s;
-                        y = -x - f * r / (p + s);
-                        g = e * r / (p + s);
-                        z = -x - e * q / (p + s);
-                        for (j = k; j < m; j++) {
-                            b = A.getByIndex(k, j);
-                            c = A.getByIndex(k + 1, j);
-                            p = x * b + e * c;
-                            q = e * b + y * c;
-                            r = f * b + g * c;
-                            if (k != m - 2) {
-                                b = A.getByIndex(k + 2, j);
-                                p += f * b;
-                                q += g * b;
-                                r += z * b;
-                                A.setByIndex(k + 2, j, r);
-                            }
-                            A.setByIndex(k + 1, j, q);
-                            A.setByIndex(k, j, p);
-                        }
-                        j = k + 3;
-                        if (j > m - 2) {
-                            j = m - 1;
-                        }
-                        for (i = t; i < j + 1; i++) {
-                            b = A.getByIndex(i, k);
-                            c = A.getByIndex(i, k + 1);
-                            p = x * b + e * c;
-                            q = e * b + y * c;
-                            r = f * b + g * c;
-                            if (k != m - 2) {
-                                b = A.getByIndex(i, k + 2);
-                                p += f * b;
-                                q += g * b;
-                                z += z * b;
-                                A.setByIndex(i, k + 2, r);
-                            }
-                            A.setByIndex(i, k + 1, q);
-                            A.setByIndex(i, k, p);
-                        }
-                    }
-                    k++;
-                }
-            }
-        }
-        return true;
+bool BasicMatrix<T>::getEigenvalue(int LoopNumber,  BasicMatrix<T> &result) {
+    if (this->col != this->row) {
+        throw ex::NotSquareException(this->row, this->col, "eigen value");
     }
+    BasicMatrix<T> tempA (*this);//这是一个临时的矩阵，用来保存每一次被QR分解迭代的对象
+	BasicMatrix<T> tempR(this->row,this->col);
+    BasicMatrix<T>  tempQ(this->row,this->col);
+    
+	for (int i = 0; i < LoopNumber; i++) {
+		tempA.QR(tempQ, tempR);
+        BasicMatrix<T>tempRR(tempR);
+        tempRR.crossProduct(tempQ);
+		tempA = tempRR ;//下一次迭代的矩阵由RQ = Q'AQ给出
+        
+	}
+	for (int i = 0; i < this->row; i++) {
+		for (int j = 0; j < this->col; j++) {
+			if (i == j)
+				continue;
+			tempA.setByIndex(i, j, 0);
+		}
+	}//将对角阵的非对角元写成0
+	//totalQ = totalQ.transpose();
+	result = tempA;
+    return true;
+}
 
     template <class T>
     T BasicMatrix<T>::getRowMin(int row) {
@@ -735,42 +583,21 @@ namespace mat {
     }
 
     template <class T>
-    BasicMatrix<T>& BasicMatrix<T>::getEigenvector(BasicMatrix<T> &eigenvector) {
-        T iterator[this->col];
-        for (int i = 0; i < this->col; i++)
+    BasicMatrix<T> &BasicMatrix<T>::getEigenvector(BasicMatrix<T> &eigenvector,const T lamda) {
+        BasicMatrix<T>eigenM(this->col,this->row);
+        for (int i = 0; i <this->row; i++)
         {
-            iterator[i]=1;
+            for (int j = 0; j <this->col; j++)
+            {
+                eigenM.setByIndex(i,j,this->getByIndex(i,j));
+                if (i == j)
+                    eigenM.setByIndex(i,j,this->getByIndex(i,j)-lamda);
+
+            }
         }
-
-
-        T y=1.0;
-        T z;
-
-        do
-        {
-            z=y;
-            this->loop(iterator);
-            T max=iterator[0];
-            for (int i = 0; i < this->col; i++)//求最大值
-            {
-                if(y<iterator[i])
-                    max=iterator[i];
-            }
-            y=max;
-            for (int i = 0; i < this->col; i++)
-            {
-                eigenvector.setByIndex(i,0,iterator[i]/y);
-                iterator[i]=eigenvector.getByIndex(i,0);
-            }
-
-
-
-
-        } while (fabs(z-y)>=0.000001);
-        cout<<"y= "<<y<<endl;
+        Gaussian_Eliminate(eigenvector, eigenM);
         return eigenvector;
     }
-
 
     template <class T>
     bool BasicMatrix<T>::getEigen(BasicMatrix<T> &eigenvector, BasicMatrix<T> &eigenvalue, double error, double iterator) {
@@ -862,6 +689,7 @@ namespace mat {
             }
         }
         eigenvector = temp;
+        return true;
     }
 
     template <class T>
@@ -874,6 +702,119 @@ namespace mat {
             trace += getByIndex(i, i);
         }
         return trace;
+    }
+
+    template <class T>
+    void BasicMatrix<T>::QR(BasicMatrix<T>&Q,BasicMatrix<T>&R){
+        int i,j,k,r,m;
+        T temp,sum,dr,cr,hr;
+        BasicMatrix<T>ur(this->row*this->row,1);
+        BasicMatrix<T>pr(this->row*this->row,1);
+        BasicMatrix<T>wr(this->row*this->row,1);
+
+        BasicMatrix<T>q1(this->row,this->row);
+        BasicMatrix<T>emp(this->row,this->row);
+
+        for(i=0;i<this->row;i++)//将a放入temp中
+
+            for(j=0;j<this->col;j++)
+            {
+                emp.setByIndex(i,j,this->getByIndex(i,j));
+            };
+        for(i=0;i<this->row;i++)//定义单位矩阵
+
+            for(j=0;j<this->col;j++)
+            {
+                if(i==j)Q.setByIndex(i,j,1);
+
+                else Q.setByIndex(i,j,0);
+            };
+
+        for(r=0;r<this->col;r++)
+        {
+            temp=0;
+
+            for(k=r;k<this->col;k++)
+
+                temp+=fabs(this->getByIndex(k,r));
+
+            if(temp>=0.0)
+            {
+                sum=0;
+
+                for(k=r;k<this->row;k++)
+                    sum+=this->getByIndex(k,r)*this->getByIndex(k,r);
+                dr=sqrt(sum);
+                if(this->getByIndex(r,r)>0.0)m=-1;
+
+                else m=1;
+                cr=m*dr;
+                hr=cr*(cr-this->getByIndex(r,r));
+
+                for(i=0;i<this->col;i++)//定义ur
+                {
+                    if(i<r)ur.setByIndex(i,0,0);
+
+                    if(i==r)ur.setByIndex(i,0,this->getByIndex(r,r)-cr);
+
+                    if(i>r)ur.setByIndex(i,0,this->getByIndex(i,r));
+                };
+
+                for(i=0;i<this->row;i++)//定义wr
+                {
+                    sum=0;
+
+                    for(j=0;j<this->row;j++)
+
+                        sum+=Q.getByIndex(i,j)*ur.getByIndex(j,0);
+                    wr.setByIndex(i,0,sum);
+                };
+
+                for(i=0;i<this->row;i++)//定义qr
+                    for(j=0;j<this->row;j++)
+                    {
+                        q1.setByIndex(i,j,Q.getByIndex(i,j)-wr.getByIndex(i,0)*ur.getByIndex(j,0)/hr);
+
+                    };
+                for(i=0;i<this->row;i++)//定义qr+1
+                    for(j=0;j<this->row;j++)
+                    {
+                        Q.setByIndex(i,j,q1.getByIndex(i,j));
+                    };
+                for(i=0;i<this->col;i++)//定义pr
+                {
+                    sum=0;
+                    for(j=0;j<this->col;j++)
+                        sum+=this->getByIndex(j,i)*ur.getByIndex(j,0);
+                    pr.setByIndex(i,0,sum/hr);
+                };
+
+                for(i=0;i<this->row;i++)
+                    for(j=0;j<this->col;j++)
+                    {
+                        this->setByIndex(i,j,this->getByIndex(i,j)-ur.getByIndex(i,0)*pr.getByIndex(j,0));
+
+                    };
+            };
+        };
+        for(i=0;i<this->row;i++)
+            for(j=0;j<this->col;j++)
+            {
+                if(fabs(this->getByIndex(i,j))<0.0)this->setByIndex(i,j,0);
+            };
+
+        for(i=0;i<this->row;i++)
+            for(j=0;j<this->col;j++)
+            {
+                R.setByIndex(i,j,this->getByIndex(i,j));
+
+            };
+
+        for(i=0;i<this->row;i++)//将a取出
+            for(j=0;j<this->col;j++)
+            {
+                this->setByIndex(i,j,emp.getByIndex(i,j));
+            }
     }
 
     template <class T>
@@ -902,6 +843,8 @@ namespace mat {
         }
         return det;
     }
+    
+    
 
     template <class T>
     void BasicMatrix<T>::reshape(int row, int col) {

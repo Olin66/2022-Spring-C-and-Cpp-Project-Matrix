@@ -7,7 +7,7 @@
 #include <opencv2/opencv.hpp>
 #include <cstring>
 #include <iostream>
-#include <math.h>
+#include <cmath>
 #include <string>
 #include <vector>
 #include <set>
@@ -125,9 +125,11 @@ namespace mat {
 
         T getColAvg(int);
 
-        T getEigenvalue();
+    T getEigenvalue(int LoopNumber,  BasicMatrix<T> &result);
 
-        Matrix<T> &getEigenvector();
+    void Gaussian_Eliminate(SparseMatrix<T>&ans,SparseMatrix<T>&eigenmatirx);
+
+        SparseMatrix<T> &getEigenvector(SparseMatrix<T> &eigenvector,const T lamda);
 
         T getByIndex(int _row, int _col) const;
 
@@ -152,6 +154,8 @@ namespace mat {
         map<int, Triple<T> *> getTriples() const {
             return this->tri_map;
         }
+
+        void QR(SparseMatrix<T>&Q,SparseMatrix<T>&R);
 
         void show();
 
@@ -380,7 +384,7 @@ namespace mat {
 
     template<class T>
     void SparseMatrix<T>::crossProduct(const SparseMatrix<T> &right) {
-         if (this->col != right.row) {
+        if (this->col != right.row) {
             throw ex::MismatchedSizeException(*this, right, "matrix cross product");
         }
         int r = this->row;
@@ -399,14 +403,47 @@ namespace mat {
         *this = mat;
     }
 
-    template<class T>
-    void SparseMatrix<T>::transpose() {
-
+template <class T>
+void SparseMatrix<T>::transpose() {
+    SparseMatrix<T> mat(this->col, this->row);
+    for (int i = 0; i < this->row; i++) {
+        for (int j = 0; j < this->col; j++) {
+            mat.setByIndex(j, i, this->getByIndex(i, j));
+        }
     }
+    *this = mat;
+}
 
     template<class T>
     void SparseMatrix<T>::inverse() {
-
+        T det = this->getDeterminant();
+        if (this->col != this->col || det == 0) //行列式为0的矩阵不可逆
+        {
+            throw ex::NoInverseException(*this, "matrix inverse");
+        }
+        SparseMatrix<T> temp(this->row - 1, this->col - 1);
+        SparseMatrix<T> adjoint(this->row, this->col);
+        if (this->col == 1) {
+            return; //一阶矩阵逆是本身
+        }
+        for (int i = 0; i < this->col; i++) {
+            for (int j = 0; j < this->col; j++) {
+                for (int k = 0; k < this->col - 1; k++) {
+                    for (int l = 0; l < this->col - 1; l++) {
+                        temp.setByIndex(k, l, this->getByIndex(k >= i ? k + 1 : k, l >= j ? l + 1 : l));
+                    }
+                }
+                adjoint.setByIndex(j, i, temp.getDeterminant()); //进行了一次转置。
+                if ((i + j) % 2 == 1) {
+                    adjoint.setByIndex(j, i, -adjoint.getByIndex(j, i)); //将每一个元素的代数余子式加上正负号生成伴随矩阵
+                }
+            }
+        }
+        for (int i = 0; i < this->col; i++) {
+            for (int j = 0; j < this->row; j++) {
+                this->setByIndex(i, j, adjoint.getByIndex(i, j) / det);
+            }
+        }
     }
 
     template<class T>
@@ -423,7 +460,14 @@ namespace mat {
 
     template<class T>
     void SparseMatrix<T>::conjugate() {
-
+        for (int i = 0; i < this->row; i++) {
+            for (int j = 0; j < this->col; j++) {
+                if (imag(this->getByIndex(i, j)) != 0) {
+                    T temp = real(this->getByIndex(i, j)) - imag(this->getByIndex(i, j));
+                    this->setByIndex(i, j, temp);
+                }
+            }
+        }
     }
 
     template<class T>
@@ -548,20 +592,88 @@ namespace mat {
         return this->getColSum(col) / this->row;
     }
 
-    template<class T>
-    T SparseMatrix<T>::getEigenvalue() {
+    template <class T>
+    T SparseMatrix<T>::getEigenvalue(int LoopNumber,  BasicMatrix<T> &result) {
+        if (this->col != this->row) {
+            throw ex::NotSquareException(this->row, this->col, "eigen value");
+        }
+        SparseMatrix<T> tempA (*this);//这是一个临时的矩阵，用来保存每一次被QR分解迭代的对象
+        SparseMatrix<T> tempR(this->row,this->col);
+        SparseMatrix<T>  tempQ(this->row,this->col);
+
+        for (int i = 0; i < LoopNumber; i++) {
+            tempA.QR(tempQ, tempR);
+            SparseMatrix<T>tempRR(tempR);
+            tempRR.crossProduct(tempQ);
+            tempA = tempRR ;//下一次迭代的矩阵由RQ = Q'AQ给出
+
+        }
+        for (int i = 0; i < this->row; i++) {
+            for (int j = 0; j < this->col; j++) {
+                if (i == j)
+                    continue;
+                tempA.setByIndex(i, j, 0);
+            }
+        }//将对角阵的非对角元写成0
+        //totalQ = totalQ.transpose();
+        result = tempA;
+        return true;
     }
 
-    template<class T>
-    Matrix<T> &SparseMatrix<T>::getEigenvector() {
+    template <class T>
+    SparseMatrix<T> &SparseMatrix<T>::getEigenvector(SparseMatrix<T> &eigenvector,const T lamda) {
+        BasicMatrix<T>eigenM(this->col,this->row);
+        for (int i = 0; i <this->row; i++)
+        {
+            for (int j = 0; j <this->col; j++)
+            {
+                eigenM.setByIndex(i,j,this->getByIndex(i,j));
+                if (i == j)
+                    eigenM.setByIndex(i,j,this->getByIndex(i,j)-lamda);
+
+            }
+        }
+        Gaussian_Eliminate(eigenvector, eigenM);
+        return eigenvector;
     }
 
     template<class T>
     T SparseMatrix<T>::getTrace() {
+        if (this->col != this->row) {
+            throw ex::NotSquareException(*this, "matrix trace");
+        }
+        T trace = 0;
+        for (int i = 0; i < this->col; i++) {
+            trace += getByIndex(i, i);
+        }
+        return trace;
     }
 
     template<class T>
     T SparseMatrix<T>::getDeterminant() {
+        if (this->col != this->row) {
+            throw ex::NotSquareException(*this, "matrix determinant");
+        }
+        T det = 0;
+        if (this->col == 1) {
+            det = getByIndex(0, 0);
+        } else if (this->col == 2) {
+            det = this->getByIndex(0, 0) * getByIndex(1, 1) - getByIndex(0, 1) * getByIndex(1, 0); //一阶二阶直接计算
+        } else {
+            for (int k = 0; k < this->col; k++) {
+                SparseMatrix<T> M(this->row - 1, this->col - 1); //为代数余子式申请内存
+                for (int i = 0; i < this->col - 1; i++) {
+                    for (int j = 0; j < this->col - 1; j++) {
+                        M.setByIndex(i, j, this->getByIndex(i + 1, j < k ? j : j + 1)); //为代数余子式赋值
+                    }
+                }
+                if (this->getByIndex(0, k) != 0) //如果是零可以直接不继续算
+                {
+                    det += this->getByIndex(0, k) * M.getDeterminant() * (((2 + k) % 2) == 1 ? -1 : 1); //从一第行展开，采用递归算法计算行列式
+                }
+            }
+        }
+        return det;
     }
 
     template<class T>
@@ -653,6 +765,164 @@ namespace mat {
         SparseMatrix<T> temp(*this);
         for (int i = 0; i < exp; i++)
             this->crossProduct(temp);
+    }
+
+
+    template <class T>
+    void SparseMatrix<T>::QR(SparseMatrix<T>&Q,SparseMatrix<T>&R){
+        int i,j,k,r,m;
+        T temp,sum,dr,cr,hr;
+        SparseMatrix<T>ur(this->row*this->row,1);
+        SparseMatrix<T>pr(this->row*this->row,1);
+        SparseMatrix<T>wr(this->row*this->row,1);
+
+        SparseMatrix<T>q1(this->row,this->row);
+        SparseMatrix<T>emp(this->row,this->row);
+
+        for(i=0;i<this->row;i++)//将a放入temp中
+
+            for(j=0;j<this->col;j++)
+            {
+                emp.setByIndex(i,j,this->getByIndex(i,j));
+            };
+        for(i=0;i<this->row;i++)//定义单位矩阵
+
+            for(j=0;j<this->col;j++)
+            {
+                if(i==j)Q.setByIndex(i,j,1);
+
+                else Q.setByIndex(i,j,0);
+            };
+
+        for(r=0;r<this->col;r++)
+        {
+            temp=0;
+
+            for(k=r;k<this->col;k++)
+
+                temp+=fabs(this->getByIndex(k,r));
+
+            if(temp>=0.0)
+            {
+                sum=0;
+
+                for(k=r;k<this->row;k++)
+                    sum+=this->getByIndex(k,r)*this->getByIndex(k,r);
+                dr=sqrt(sum);
+                if(this->getByIndex(r,r)>0.0)m=-1;
+
+                else m=1;
+                cr=m*dr;
+                hr=cr*(cr-this->getByIndex(r,r));
+
+                for(i=0;i<this->col;i++)//定义ur
+                {
+                    if(i<r)ur.setByIndex(i,0,0);
+
+                    if(i==r)ur.setByIndex(i,0,this->getByIndex(r,r)-cr);
+
+                    if(i>r)ur.setByIndex(i,0,this->getByIndex(i,r));
+                };
+
+                for(i=0;i<this->row;i++)//定义wr
+                {
+                    sum=0;
+
+                    for(j=0;j<this->row;j++)
+
+                        sum+=Q.getByIndex(i,j)*ur.getByIndex(j,0);
+                    wr.setByIndex(i,0,sum);
+                };
+
+                for(i=0;i<this->row;i++)//定义qr
+                    for(j=0;j<this->row;j++)
+                    {
+                        q1.setByIndex(i,j,Q.getByIndex(i,j)-wr.getByIndex(i,0)*ur.getByIndex(j,0)/hr);
+
+                    };
+                for(i=0;i<this->row;i++)//定义qr+1
+                    for(j=0;j<this->row;j++)
+                    {
+                        Q.setByIndex(i,j,q1.getByIndex(i,j));
+                    };
+                for(i=0;i<this->col;i++)//定义pr
+                {
+                    sum=0;
+                    for(j=0;j<this->col;j++)
+                        sum+=this->getByIndex(j,i)*ur.getByIndex(j,0);
+                    pr.setByIndex(i,0,sum/hr);
+                };
+
+                for(i=0;i<this->row;i++)
+                    for(j=0;j<this->col;j++)
+                    {
+                        this->setByIndex(i,j,this->getByIndex(i,j)-ur.getByIndex(i,0)*pr.getByIndex(j,0));
+
+                    };
+            };
+        };
+        for(i=0;i<this->row;i++)
+            for(j=0;j<this->col;j++)
+            {
+                if(fabs(this->getByIndex(i,j))<0.0)this->setByIndex(i,j,0);
+            };
+
+        for(i=0;i<this->row;i++)
+            for(j=0;j<this->col;j++)
+            {
+                R.setByIndex(i,j,this->getByIndex(i,j));
+
+            };
+
+        for(i=0;i<this->row;i++)//将a取出
+            for(j=0;j<this->col;j++)
+            {
+                this->setByIndex(i,j,emp.getByIndex(i,j));
+            }
+    }
+    template <class T>
+    void SparseMatrix<T>::Gaussian_Eliminate(SparseMatrix<T>&ans,SparseMatrix<T>&eigenmatirx){
+        T max;
+        short row;//每列的最大值及其行数
+        T temp[eigenmatirx.col];
+        for (int j = 0; j < eigenmatirx.col - 1; j++)//j为参考列
+        {
+            //找出列最大值及其行数
+            max = abs(eigenmatirx.getByIndex(j,j));
+            row = j;
+            for (int i = j+1; i < eigenmatirx.col; i++)
+            {
+                if (abs(eigenmatirx.getByIndex(i,j)) > max)
+                {
+                    max = abs(eigenmatirx.getByIndex(i,j));
+                    row = i;
+                }
+            }
+            //将最大值行与第一行交换
+            if (row != j)
+            {
+                for (int i = j; i < eigenmatirx.col; i++)
+                    temp[i] = eigenmatirx.getByIndex(row,i);
+                for (int i = j; i < eigenmatirx.col; i++)
+                    eigenmatirx.setByIndex(row,i,eigenmatirx.getByIndex(j,i));
+                for (int i = j; i < eigenmatirx.col; i++)
+                    eigenmatirx.setByIndex(j,i,temp[i]);
+            }
+            //开始按列消元,即每次将除最大值行以外的一列清零
+            for (int i = j + 1; i < eigenmatirx.col; i++)
+                for (int k = j + 1; k <eigenmatirx.col; k++)
+                    eigenmatirx.setByIndex(i,k,eigenmatirx.getByIndex(i,k)-eigenmatirx.getByIndex(i,j)/eigenmatirx.getByIndex(j,j)*eigenmatirx.getByIndex(j,k));
+
+        }
+        ans.setByIndex(eigenmatirx.col-1,0,1);
+        for (int i = eigenmatirx.col - 2; i >= 0; i--)
+        {
+            ans.setByIndex(i,0,0);
+            for (int j = eigenmatirx.row - 1; j > i; j--)
+                ans.setByIndex(i,0,ans.getByIndex(i,0)-eigenmatirx.getByIndex(i,j)*ans.getByIndex(0,j));
+            ans.setByIndex(i,0,ans.getByIndex(i,0)/eigenmatirx.getByIndex(i,i));
+
+        }
     }
 
     template<class T>
