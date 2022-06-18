@@ -1,46 +1,20 @@
 #include <iostream>
-#include <opencv2/opencv.hpp>
 #include <vector>
 #include "matrix.h"
 #include "basic-matrix.h"
-#define BASIC_MATRIX_INT BasicMatrix<int>
+#define BASIC_MATRIX_INT SparseMatrix<int>//BasicMatrix<int>
 #define SPARSE_MATRIX_INT SparseMatrix<int>
 using namespace std;
 using namespace mat;
-using namespace cv;
-
-void matrix_dot_product() {
-    const int TEST_SIZE = 6;
-    int *_data = new int[TEST_SIZE]{1,2,3,4,5,6};
-    BASIC_MATRIX_INT bm1(3, 2, _data);
-    BASIC_MATRIX_INT bm2(3, 2, _data);
-    bm1.show();
-    bm1.add(bm2);
-    bm1.show();
-    bm1.dotProduct(bm2);
-    bm1.show();
-    int *_data1 = new int[TEST_SIZE/2]{1,2,3};
-    BASIC_MATRIX_INT bm3(3, 1, _data1);
-    bm3.show();
-    bm2.show();
-    bm3.dotProduct(bm2);
-    bm3.show();
-}
-
-void matrix_cross_product() {
-    const int TEST_SIZE = 6;
-    int *_data = new int[TEST_SIZE]{1,2,3,4,5,6};
-    BASIC_MATRIX_INT bm1(3, 2, _data);
-    BASIC_MATRIX_INT bm2(2, 3, _data);
-    bm1.show();
-    bm2.show();
-    bm1.crossProduct(bm2);
-    bm1.show();
-}
+void matrix_dot_product();
+void matrix_cross_product();
+void matrix_convolution();
 
 int main() {
-    // matrix_cross_product();
-    // return 0;
+    matrix_dot_product();
+    matrix_cross_product();
+    //matrix_convolution();
+    return 0;
     Matrix<int> *m;
     BasicMatrix<int> bm1(3, 2);
     BasicMatrix<int> bm2(3, 2);
@@ -87,8 +61,6 @@ int main() {
     //     cout<<mm.getData()[i]<<endl;;
     // }
     
-
-    SparseMatrix<int> sm1(v);
     // sm1.show();
 
     cout<<endl;
@@ -127,6 +99,58 @@ int main() {
     SparseMatrix<int> sm4(2, 2);
     sm4 = sm3;
     sm4.show();
+}
 
-    Mat mat1(2, 2, CV_8UC1);
+void matrix_dot_product() {
+    cout << "matrix dot product test begins:" << endl;
+    const int TEST_SIZE = 6;
+    int *_data = new int[TEST_SIZE]{1,2,3,4,5,6};
+    BASIC_MATRIX_INT bm1(3, 2, _data);
+    BASIC_MATRIX_INT bm2(3, 2, _data);
+    bm1.show();
+    bm1.add(bm2);
+    bm1.show();
+    bm1.dotProduct(bm2);
+    bm1.show();
+    int *_data1 = new int[TEST_SIZE/2]{1,2,3};
+    BASIC_MATRIX_INT bm3(3, 1, _data1);
+    bm3.show();
+    bm2.show();
+    bm3.dotProduct(bm2);
+    bm3.show();
+    cout << endl;
+}
+
+void matrix_cross_product() {
+    cout << "matrix cross product test begins:" << endl;
+    const int TEST_SIZE = 6;
+    int *_data = new int[TEST_SIZE]{1,2,3,4,5,6};
+    BASIC_MATRIX_INT bm1(3, 2, _data);
+    BASIC_MATRIX_INT bm2(2, 3, _data);
+    bm1.show();
+    bm2.show();
+    bm1.crossProduct(bm2);
+    bm1.show();
+    cout << endl;
+}
+
+void matrix_convolution() {
+    const int TEST_SIZE = 16;
+    int *_data1 = new int[TEST_SIZE]{
+        1, 2, 3, 4,
+        5, 6, 7, 8,
+        9, 10, 11, 12,
+        13, 14, 15, 16};
+    BASIC_MATRIX_INT bm1(4, 4, _data1);
+
+    int *_data2 = new int[9]{
+        -1, -2, -1,
+        0, 0, 0,
+        1, 2, 1};
+    BASIC_MATRIX_INT bm2(3, 3, _data2);
+    bm1.show();
+    bm2.show();
+    BASIC_MATRIX_INT* mat_ans = bm1.convolve(bm2, 1, 1);
+    cout << " Answer of matrix convolution" << endl;
+    mat_ans->show();
 }
