@@ -104,4 +104,7 @@ int main() {
 
     m3 = 2 * m3;
     m3.show();
+
+    BasicMatrix<int> m4(2, 2, 100);
+    m4.show();
 }

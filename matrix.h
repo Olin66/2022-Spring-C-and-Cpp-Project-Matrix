@@ -10,6 +10,10 @@
 
 namespace mat {
 
+    #define MATRIX_TYPE bool
+    #define BASIC_MATRIX true
+    #define SPARSE_MATRIX false
+
  namespace ex {
         class MatrixException;
         class MismatchedSizeException;
@@ -143,6 +147,9 @@ namespace mat {
 
         virtual void show() {
             std::cout << "Base class Matrix" << std::endl;
+        }
+
+        static Matrix<T> * eye(int row, int col, MATRIX_TYPE type){
         }
     };
 

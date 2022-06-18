@@ -12,7 +12,6 @@
 using namespace std;
 namespace mat {
 
-#define MATRIX_TYPE int
 #define ZERO_MATRIX 0
 #define ONE_MATRIX 1
 #define EYE_MATRIX 2
@@ -41,7 +40,7 @@ class BasicMatrix : public Matrix<T> {
     T *m_data;
 
   public:
-    BasicMatrix(int, int, MATRIX_TYPE=0);
+    BasicMatrix(int, int, T val=0);
 
     BasicMatrix(int, int, T *);
 
@@ -52,6 +51,8 @@ class BasicMatrix : public Matrix<T> {
     BasicMatrix(const BasicMatrix<T> &);
 
     BasicMatrix<T> &operator=(const BasicMatrix<T> &);
+
+    ~BasicMatrix<T>();
 
     void add(const BasicMatrix<T> &);
 
@@ -159,17 +160,12 @@ class BasicMatrix : public Matrix<T> {
 };
 
 template <class T>
-BasicMatrix<T>::BasicMatrix(int row, int col, MATRIX_TYPE type) : Matrix<T>(row, col) {
+BasicMatrix<T>::BasicMatrix(int row, int col, T val) : Matrix<T>(row, col) {
     this->m_data = new T[this->getSize()];
-    if (type == 0) std::memset(m_data, 0, sizeof(T) * this->getSize());
-    else if (type==1) std::memset(m_data, 1, sizeof(T) * this->getSize());
+    if (val == 0) std::memset(m_data, 0, sizeof(T) * this->getSize());
     else {
-        if (row != col) throw ex::NotSquareException(row, col, "creating the identity matrix");
-        else {
-            std::memset(m_data, 0, sizeof(T) * this->getSize());
-            for (size_t i = 0; i < this->getCol(); i++)
-                setByIndex(i, i, 1);
-        }
+        for (size_t i = 0; i < this->getSize(); i++)
+            m_data[i] = val;
     }
 }
 
@@ -210,6 +206,11 @@ BasicMatrix<T> &BasicMatrix<T>::operator=(const BasicMatrix<T> &right) {
     for (size_t i = 0; i < this->getSize(); i++)
         this->m_data[i] = right.m_data[i];
     return (*this);
+}
+
+template<class T>
+BasicMatrix<T>::~BasicMatrix<T>(){
+    delete[] m_data;
 }
 
 template <class T>
@@ -939,6 +940,12 @@ Matrix<T> &BasicMatrix<T>::convolve(SparseMatrix<T> &, int stride, int padding) 
 
 template <class T>
 void BasicMatrix<T>::exponent(int exp) {
+    if(this->getRow() != this->getCol()) 
+        throw ex::NotSquareException(*this, "doing matrix exponential");
+    BasicMatrix<T> temp(*this);
+    for (int i = 0; i < exp; i++)
+        this->crossProduct(temp);
+    temp.~BasicMatrix<T>();
 }
 
 template <class T>
