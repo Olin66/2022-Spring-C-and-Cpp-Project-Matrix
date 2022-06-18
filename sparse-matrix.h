@@ -150,6 +150,8 @@ namespace mat {
         std::set<Triple<T>> getTriples() const{
             return this->triples;
         }
+
+        void show();
     };
 
     template<class T>
@@ -547,8 +549,13 @@ namespace mat {
     if (this->getSize() == _size) {
         this->setRow(col);
         this->setCol(row);
-        
-        
+        for (size_t i = 0; i < this->getTriples().size(); i++)
+        {
+            Triple<T>& tri = this->getTriples()[i];
+            int temp = tri._col;
+            tri._col = tri._row;
+            tri._row = temp;
+        }
     } else
         throw ex::MismatchedSizeException(this->getRow(), this->getCol(), row, col, "matrix reshaping");
         
@@ -582,6 +589,25 @@ namespace mat {
         
     }
 
+    template<class T>
+    void SparseMatrix<T>::show(){
+        using namespace std;
+        T mat[this->getRow()][this->getCol()];
+        memset(mat, 0, sizeof(mat));
+        for (size_t i = 0; i < this->getTriples().size(); i++)
+        {
+            Triple<T> tri = this->getTriples()[i];
+            mat[tri._row][tri._col] = tri.val;
+        }
+        for (size_t i = 0; i < this->getRow(); i++)
+        {
+            for (size_t j = 0;j < this->getCol(); j++)
+            {
+                cout<<mat[i][j]<<" ";
+            }
+            cout<<endl;
+        }
+    }
 }
 
 #endif

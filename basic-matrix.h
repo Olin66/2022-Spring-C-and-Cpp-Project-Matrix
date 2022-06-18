@@ -139,6 +139,11 @@ class BasicMatrix : public Matrix<T> {
     template <typename P>
     BasicMatrix<T> operator*(P);
 
+    template <typename P>
+    friend BasicMatrix<T> operator*(P val, BasicMatrix<T>& right){
+        return right * val;
+    }
+
     T *getData() {
         return this->m_data;
     }
@@ -211,6 +216,9 @@ void BasicMatrix<T>::add(const BasicMatrix<T> &right) {
 
 template <class T>
 void BasicMatrix<T>::add(const SparseMatrix<T> & right) {
+    if (this->getRow() != right.getRow() || this->getCol() != right.getCol())
+        throw ex::MismatchedSizeException(*this, right,
+                                          "matrix addition");
     for (auto it = right.getTriples().begin();it != right.getTriples().end();it++)
     {
         auto tri = *it;
@@ -223,7 +231,7 @@ template <class T>
 void BasicMatrix<T>::subtract(const BasicMatrix<T> &right) {
     if (this->getRow() != right.getRow() || this->getCol() != right.getCol()) {
         throw ex::MismatchedSizeException(*this, right,
-                                          "matrix subtract");
+                                          "matrix subtraction");
     }
     for (size_t i = 0; i < this->getSize(); i++) {
         this->m_data[i] = this->m_data[i] - right.m_data[i];
@@ -232,6 +240,9 @@ void BasicMatrix<T>::subtract(const BasicMatrix<T> &right) {
 
 template <class T>
 void BasicMatrix<T>::subtract(const SparseMatrix<T> & right) {
+    if (this->getRow() != right.getRow() || this->getCol() != right.getCol())
+        throw ex::MismatchedSizeException(*this, right,
+                                          "matrix subtraction");
     for (auto it = right.getTriples().begin();it != right.getTriples().end();it++)
     {
         auto tri = *it;
@@ -367,9 +378,9 @@ void BasicMatrix<T>::reverse() {
 
 template <class T>
 void BasicMatrix<T>::conjugate() {
-    for (int i = 0; i < this->row; i++)
+    for (int i = 0; i < this->getRow(); i++)
     {
-        for (int j = 0; j < count; j++)
+        for (int j = 0; j < this->getCol(); j++)
         {
             if(imag(this->getByIndex(i,j))!=0){
                 T temp=real(this->getByIndex(i,j))-imag(this->getByIndex(i,j));
@@ -924,28 +935,57 @@ void BasicMatrix<T>::show() {
 }
 
 template <class T>
-BasicMatrix<T> BasicMatrix<T>::operator+(const BasicMatrix<T> &) {
-    return BasicMatrix<T>(0, 0);
+BasicMatrix<T> BasicMatrix<T>::operator+(const BasicMatrix<T> & right) {
+       if (this->getRow() != right.getRow() || this->getCol() != right.getCol())
+        throw ex::MismatchedSizeException(*this, right,
+                                          "matrix addition");
+    T new_data[this->getSize()];
+    for (size_t i = 0; i < this->getSize(); i++) {
+        new_data[i] = this->m_data[i] + right.m_data[i];
+    }
+    return BasicMatrix<T>(this->getRow(), this->getCol(), new_data);
 }
 
 template <class T>
-BasicMatrix<T> BasicMatrix<T>::operator+(const SparseMatrix<T> &) {
-    return BasicMatrix<T>(0, 0);
+BasicMatrix<T> BasicMatrix<T>::operator+(const SparseMatrix<T> & right) {
+       if (this->getRow() != right.getRow() || this->getCol() != right.getCol())
+        throw ex::MismatchedSizeException(*this, right,
+                                          "matrix addition");
+    T new_data[this->getSize()];
+    memcpy(new_data, m_data, this->getSize() * sizeof(T));
+    for (size_t i = 0; i < right.getTriples().size(); i++)
+    {
+        
+    }
+    
 }
 
 template <class T>
-BasicMatrix<T> BasicMatrix<T>::operator-(const BasicMatrix<T> &) {
-    return BasicMatrix<T>(0, 0);
+BasicMatrix<T> BasicMatrix<T>::operator-(const BasicMatrix<T> & right) {
+       if (this->getRow() != right.getRow() || this->getCol() != right.getCol())
+        throw ex::MismatchedSizeException(*this, right,
+                                          "matrix addition");
+    T new_data[this->getSize()];
+    for (size_t i = 0; i < this->getSize(); i++) {
+        new_data[i] = this->m_data[i] - right.m_data[i];
+    }
+    return BasicMatrix<T>(this->getRow(), this->getCol(), new_data);
 }
 
 template <class T>
-BasicMatrix<T> BasicMatrix<T>::operator-(const SparseMatrix<T> &) {
+BasicMatrix<T> BasicMatrix<T>::operator-(const SparseMatrix<T> & right) {
     return BasicMatrix<T>(0, 0);
 }
 
 template <class T>
 template <typename P>
-BasicMatrix<T> BasicMatrix<T>::operator*(P) {
+BasicMatrix<T> BasicMatrix<T>::operator*(P val) {
+    T new_data[this->getSize()];
+    for (size_t i = 0; i < this->getSize(); i++)
+    {
+        new_data[i] = this->m_data[i] * val;
+    }
+    return BasicMatrix<T>(this->getRow(), this->getCol(), new_data);
 }
 
 template <class T>

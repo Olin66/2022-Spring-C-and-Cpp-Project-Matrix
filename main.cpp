@@ -36,8 +36,8 @@ void matrix_cross_product() {
     bm1.show();
 }
 int main() {
-    matrix_cross_product();
-    return 0;
+    // matrix_cross_product();
+    // return 0;
     Matrix<int> *m;
     BasicMatrix<int> bm1(3, 2);
     BasicMatrix<int> bm2(3, 2);
@@ -68,14 +68,37 @@ int main() {
 
     bm1.add(qm);
 
+    BasicMatrix<int> bm3 = bm1 + qm;
+
+    bm3.show();
+
     BasicMatrix<int> mm(bm1);
 
     // BasicMatrix<int> a = bm * qm;
 
-    for (int i = 0; i < bm1.getSize(); i++)
-    {
-        cout<<mm.getData()[i]<<endl;;
-    }
+    // for (int i = 0; i < bm1.getSize(); i++)
+    // {
+    //     cout<<mm.getData()[i]<<endl;;
+    // }
     
 
+    // SparseMatrix<int> sm1(v);
+    // sm1.show();
+
+    cout<<endl;
+    cout<<endl;
+    cout<<endl;
+    cout<<endl;
+    BasicMatrix<int> m1(v);
+    m1.show();
+    BasicMatrix<int> m2(v);
+    BasicMatrix<int> m3 = m1 + m2;
+    m3.show();
+
+    m3 = m3 * 2;
+
+    m3.show();
+
+    m3 = 2 * m3;
+    m3.show();
 }
