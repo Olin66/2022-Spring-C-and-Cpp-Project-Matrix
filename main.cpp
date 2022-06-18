@@ -9,6 +9,7 @@ using namespace mat;
 void matrix_dot_product();
 void matrix_cross_poduct();
 void matrix_convolution();
+
 int main() {
     matrix_convolution();
     return 0;
@@ -79,6 +80,23 @@ int main() {
 
     BasicMatrix<int> m4(2, 2, 100);
     m4.show();
+
+    vector<Triple<int>> v3;
+    v3.push_back(Triple<int>(1, 1, 4));
+    v3.push_back(Triple<int>(1, 0, 1));
+    // v3.push_back(Triple<int>(1, 1, 2));
+    // v3.push_back(Triple<int>(2, 2, 4));
+    SparseMatrix<int> sm2(2, 2, v3);
+    sm2.show();
+    SparseMatrix<int> sm3(sm2);
+    // cout<<sm3.getTriples()[3]->_row<<endl;
+    // cout<<sm3.getTriples()[3]->_col<<endl;
+    // cout<<sm3.getTriples()[3]->val<<endl;
+    sm3.show();
+
+    SparseMatrix<int> sm4(2, 2);
+    sm4 = sm3;
+    sm4.show();
 }
 
 void matrix_dot_product() {
@@ -126,6 +144,7 @@ void matrix_convolution() {
     BASIC_MATRIX_INT bm2(3, 3, _data2);
     bm1.show();
     bm2.show();
-    Matrix<int> &mat_ans = bm1.convolve(bm2);
+    bm1.convolve(bm2).show();
+    BASIC_MATRIX_INT &mat_ans = bm1.convolve(bm2);
     mat_ans.show();
 }

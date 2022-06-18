@@ -139,9 +139,9 @@ namespace mat {
 
         virtual void slice(int row1, int row2, int col1, int col2) = 0;
 
-        virtual Matrix<T> &convolve(BasicMatrix<T> &, int stride = 1, int padding = 0) = 0;
+        virtual BasicMatrix<T> &convolve(BasicMatrix<T> &, int stride = 1, int padding = 0) = 0;
 
-        virtual Matrix<T> &convolve(SparseMatrix<T> &, int stride = 1, int padding = 0) = 0;
+        virtual SparseMatrix<T> &convolve(SparseMatrix<T> &, int stride = 1, int padding = 0) = 0;
 
         virtual void exponent(int) = 0;
 
@@ -150,6 +150,15 @@ namespace mat {
         }
 
         static Matrix<T> * eye(int row, int col, MATRIX_TYPE type){
+            if (row <= 0 || col <= 0) {
+                throw ex::InvalidSizeException("creating Matrix", 1, row, col);
+            }
+            if (type){
+                BasicMatrix<T> mat(row, col);
+                for (size_t i = 0; i < row; i++)
+                    mat.setByIndex(i, i, 1);
+                return &mat;
+            }
         }
     };
 

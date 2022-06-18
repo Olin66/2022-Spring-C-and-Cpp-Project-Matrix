@@ -23,6 +23,7 @@ namespace mat {
         class NotSquareException;
         class NoInverseException;
         class InvalidSizeException;
+        class InvalidTripleException;
     }
 
 template <typename>
@@ -130,9 +131,9 @@ class BasicMatrix : public Matrix<T> {
 
     void slice(int row1, int row2, int col1, int col2);
 
-    Matrix<T> &convolve(BasicMatrix<T> &, int stride = 1, int padding = 0);
+    BasicMatrix<T> &convolve(BasicMatrix<T> &, int stride = 1, int padding = 0);
 
-    Matrix<T> &convolve(SparseMatrix<T> &, int stride = 1, int padding = 0);
+    SparseMatrix<T> &convolve(SparseMatrix<T> &, int stride = 1, int padding = 0);
 
     void exponent(int exp);
 
@@ -922,7 +923,7 @@ void BasicMatrix<T>::slice(int row1, int row2, int col1, int col2) {
 }
 
 template <class T>
-Matrix<T> &BasicMatrix<T>::convolve(BasicMatrix<T> &right, int stride, int padding) {
+BasicMatrix<T> &BasicMatrix<T>::convolve(BasicMatrix<T> &right, int stride, int padding) {
     if (right.row != right.col) {
         throw ex::NotSquareException(right, "doing matrix convolution");
     }
@@ -930,8 +931,15 @@ Matrix<T> &BasicMatrix<T>::convolve(BasicMatrix<T> &right, int stride, int paddi
     int c = (this->col - right.col + 2 * padding) / stride + 1;
     BasicMatrix<T> mat(r, c);
     BasicMatrix<T> rev(right); rev.reverse();
+    rev.show();
 
     BasicMatrix<T> ext(this->row + 2 * padding, this->col + 2 * padding);
+    for (int i = 0; i < this->row; i++) {
+        for (int j = 0; j < this->col; j++) {
+            ext.setByIndex(i+padding, j+padding, this->getByIndex(i, j));
+        }
+    }
+
     for (int i = 0; i < r; i++) {
         for (int j = 0; j < c; j++) {
             for (int k = 0; k < rev.row; k++) {
@@ -941,11 +949,11 @@ Matrix<T> &BasicMatrix<T>::convolve(BasicMatrix<T> &right, int stride, int paddi
             }
         }
     }
-    return mat;
+    return new BasicMatrix<T>(mat);
 }
 
 template <class T>
-Matrix<T> &BasicMatrix<T>::convolve(SparseMatrix<T> &, int stride, int padding) {
+SparseMatrix<T> &BasicMatrix<T>::convolve(SparseMatrix<T> &, int stride, int padding) {
 }
 
 template <class T>
