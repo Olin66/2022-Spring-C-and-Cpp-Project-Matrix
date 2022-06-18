@@ -316,7 +316,8 @@ void BasicMatrix<T>::dotProduct(const BasicMatrix<T> &right) {
 }
 
 template <class T>
-void BasicMatrix<T>::dotProduct(const SparseMatrix<T> &) {
+void BasicMatrix<T>::dotProduct(const SparseMatrix<T> &right) {
+    
 }
 
 template <class T>
@@ -963,7 +964,6 @@ void BasicMatrix<T>::exponent(int exp) {
     BasicMatrix<T> temp(*this);
     for (int i = 0; i < exp; i++)
         this->crossProduct(temp);
-    temp.~BasicMatrix<T>();
 }
 
 template <class T>

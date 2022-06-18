@@ -95,9 +95,8 @@ namespace mat {
             NotSquareException(int row,int col,std::string message) :row(row),col(col),operation(message){};
             template<class T>
             NotSquareException(const BasicMatrix<T> &mat,std::string message):row(mat.getRow()),col(mat.getCol()),operation(message){};
-
             template<class T>
-            NotSquareException(const SparseMatrix<T> &mat, std::string message): row(mat.getRow()), col(mat.getCol()), operation(message) {};
+            NotSquareException(const SparseMatrix<T> &mat,std::string message):row(mat.getRow()),col(mat.getCol()),operation(message){};
              const char *what() override {
                 return (new std::string("The matrix exception occurs when " + operation + "\nThe matrix is not square!"))->c_str();
             }
