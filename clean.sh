@@ -1,4 +1,5 @@
 rm -rf CMakeFiles
+rm -rf .vscode
 rm -f cmake_install.cmake
 rm -f CMakeCache.txt
 rm -f Makefile
