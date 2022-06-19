@@ -151,6 +151,14 @@ namespace mat {
             return mat;
         }
 
+        // template<typename P>
+        // P zero(T val){
+        //     if (typeid(val) == typeid(double)) return 0e1;
+        //     if (typeid(val) == typeid(int)) return 0;
+        //     if (typeid(val) == typeid(complex<double>)) return complex<double>(0e1);
+        //     if (typeid(val) == typeid(complex<int>)) return complex<int>(0);
+        // }
+
     };
 
     template<typename P>

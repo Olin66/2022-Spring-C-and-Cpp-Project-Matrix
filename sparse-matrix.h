@@ -668,7 +668,7 @@ namespace mat {
                 }
                 if (this->getByIndex(0, k) != 0) //如果是零可以直接不继续算
                 {
-                    det += this->getByIndex(0, k) * M.getDeterminant() * (((2 + k) % 2) == 1 ? -1 : 1); //从一第行展开，采用递归算法计算行列式
+                    det += this->getByIndex(0, k) * (T)(M.getDeterminant() * (T)(((2 + k) % 2) == 1 ? -1 : 1)); //从一第行展开，采用递归算法计算行列式
                 }
             }
         }

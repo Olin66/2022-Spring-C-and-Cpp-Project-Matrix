@@ -17,6 +17,7 @@ using namespace cv;
 #define BASIC_MATRIX_INT BasicMatrix<int>
 #define BASIC_MATRIX_DOUBLE BasicMatrix<double>
 #define BASIC_MATRIX_COMPLEX_INT BasicMatrix<complex<int>>
+#define BASIC_MATRIX_COMPLEX_DOUBLE BasicMatrix<complex<double>>
 
 void bmat_constructor_test(){
     cout<<"Basic matrix constructor test begin: "<<endl;
@@ -30,10 +31,10 @@ void bmat_constructor_test(){
     bm2.show();
 
     cout<<"(3) ";
-    int* arr1 = new int[15];
+    complex<int>* arr1 = new complex<int>[15];
     for (int i = 0; i < 15; i++)
-        arr1[i] = i * 2;
-    BASIC_MATRIX_INT bm3(5, 3, arr1);
+        arr1[i] = complex<int>(1, i);
+    BASIC_MATRIX_COMPLEX_INT bm3(5, 3, arr1);
     bm3.show();
 
     cout<<"(4) ";
@@ -73,10 +74,7 @@ void bmat_add_test(){
     bm1.add(bm2);
     bm1.show();
 
-    
-}
-
-int main(){
-    bmat_constructor_test();
-    bmat_add_test();
+    cout<<"(ori 2) ";
+    BASIC_MATRIX_COMPLEX_INT bm3(2, 2, complex<int>(1, 2));
+    bm3.show();
 }

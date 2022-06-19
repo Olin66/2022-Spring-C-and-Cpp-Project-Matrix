@@ -12,7 +12,20 @@ void matrix_dot_product();
 void matrix_cross_product();
 void matrix_convolution();
 
+extern void bmat_constructor_test();
+extern void bmat_add_test();
+extern void bmat_multi_test1();
+extern void bmat_multi_test2();
+extern void bmat_multi_test3();
+extern void smat_multi_test1();
+extern void smat_multi_test2();
+extern void smat_multi_test3();
+extern void bmat_conv_test1();
+
 int main() {
+    // bmat_constructor_test();
+
+    return 0;
     // matrix_dot_product();
     // matrix_cross_product();
     // //matrix_convolution();
