@@ -158,7 +158,7 @@ namespace mat {
             for (size_t j = 0; j < this->getCol(); j++)
             {
                 double re = real(getByIndex(i, j));
-                mat->at<double>(i, j) = re;
+                mat->at<uchar>(i, j) = re;
             }
         }
         return mat;
@@ -851,8 +851,8 @@ namespace mat {
     void BasicMatrix<T>::reshape(int row, int col) {
         long _size = row * col;
         if (this->getSize() == _size) {
-            this->setRow(col);
-            this->setCol(row);
+            this->setRow(row);
+            this->setCol(col);
         } else
             throw ex::MismatchedSizeException(this->getRow(), this->getCol(), row, col, "matrix reshaping");
     }
@@ -860,16 +860,17 @@ namespace mat {
     template <class T>
     void BasicMatrix<T>::sliceRow(int row1, int row2) {
         T* _new_data_;
-        if (row1 == row2) {
-            this->setRow(1);
-            this->setSize(this->getCol());
-            _new_data_ = new T[this->getCol()];
-            int start_index = row1 * this->getCol();
-            for (size_t i = 0; i < this->getCol(); i++)
-            {
-                _new_data_[i] = this->getData()[start_index++];
-            }
-        }else if (row1 < row2){
+        // if (row1 == row2) {
+        //     this->setRow(1);
+        //     this->setSize(this->getCol());
+        //     _new_data_ = new T[this->getCol()];
+        //     int start_index = row1 * this->getCol();
+        //     for (size_t i = 0; i < this->getCol(); i++)
+        //     {
+        //         _new_data_[i] = this->getData()[start_index++];
+        //     }
+        // }else 
+        if (row1 <= row2){
             long temp = this->getCol() * (row2-row1+1);
             this->setRow(row2-row1+1);
             this->setSize(temp);
@@ -889,15 +890,16 @@ namespace mat {
     template <class T>
     void BasicMatrix<T>::sliceCol(int col1, int col2) {
         T* _new_data_;
-        if (col1 == col2){
-            this->setCol(1);
-            this->setSize(this->getRow());
-            _new_data_ = new T[this->getRow()];
-            for (size_t i = 0; i < this->getRow(); i++)
-            {
-                _new_data_[i] = col1 + i * this->getCol();
-            }
-        }else if (col1 < col2){
+        // if (col1 == col2){
+        //     this->setCol(1);
+        //     this->setSize(this->getRow());
+        //     _new_data_ = new T[this->getRow()];
+        //     for (size_t i = 0; i < this->getRow(); i++)
+        //     {
+        //         _new_data_[i] = this->m_data[col1 + i * this->getCol()];
+        //     }
+        // }else 
+        if (col1 <= col2){
             long temp = this->getRow() * (col2-col1+1);
             _new_data_ = new T[temp];
             long k = 0;
@@ -905,7 +907,7 @@ namespace mat {
             {
                 for (size_t j = col1; j <= col2; j++)
                 {
-                    _new_data_[k++] = this->m_data[j + i *this-> getCol()];
+                    _new_data_[k++] = this->m_data[j + i * this->getCol()];
                 }
             }
             this->setCol(col2-col1+1);
@@ -934,6 +936,8 @@ namespace mat {
         this->setRow(row2-row1+1);
         this->setCol(col2-col1+1);
         this->setSize(temp);
+        delete[] this->m_data;
+        this->m_data = _new_data_;
     }
 
     template<class T>

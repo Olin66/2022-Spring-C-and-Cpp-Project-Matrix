@@ -93,6 +93,8 @@ namespace mat {
 
         void crossProduct(const SparseMatrix<T> &);
 
+        bool getEigen(SparseMatrix<T> &eigenvector, SparseMatrix<T> &eigenvalue, double error, double iterator);//雅克比法计算特征值和特征向量
+
         void transpose();
 
         void inverse();
@@ -164,12 +166,22 @@ namespace mat {
 
     template<class T>
     Mat* SparseMatrix<T>::getCvMat(){
+        bool flags[this->getRow()][this->getCol()];
+        memset(flags, false, sizeof(flags));
         Mat* mat = new Mat(this->getRow(), this->getCol(), CV_8UC1);
         for (auto it = tri_map.begin(); it != tri_map.end(); it++)
         {
             auto tri = it->second;
             double re = real(getByIndex(tri->_row, tri->_col));
-            mat->at<double>(tri->_row, tri->_col) = re;
+            mat->at<uchar>(tri->_row, tri->_col) = re;
+            flags[tri->_row][tri->_col];
+        }
+        for (size_t i = 0; i < this->getRow(); i++)
+        {
+            for (size_t j = 0;j < this->getCol();j++)
+            {
+                if (!flags[i][j]) mat->at<uchar>(i, j) = 0;
+            }
         }
         return mat;
     }
@@ -257,9 +269,9 @@ namespace mat {
 
     template<class T>
     SparseMatrix<T> &SparseMatrix<T>::operator=(const SparseMatrix<T> &right) {
-        this->setSize(right.getSize());
         this->setRow(right.getRow());
         this->setCol(right.getCol());
+        this->setSize(right.getSize());
         for (auto it = this->tri_map.begin(); it != tri_map.end(); it++) {
             if (it->second != nullptr) delete it->second;
         }
@@ -276,6 +288,100 @@ namespace mat {
             if (it->second != nullptr) delete it->second;
         }
         this->tri_map.clear();
+    }
+
+    
+    template <class T>
+    bool SparseMatrix<T>::getEigen(SparseMatrix<T> &eigenvector, SparseMatrix<T> &eigenvalue, double error, double iterator) {
+        for (int i = 0; i < this->col; i++) {
+            eigenvector.setByIndex(i, i, 1.0);
+            for (int j = 0; j < this->col; j++) {
+                if (i != j) {
+                    eigenvector.setByIndex(i, j, 0.0);
+                }
+            }
+        }
+        int count = 0;
+        while (true) {
+            T max = this->getByIndex(0, 1);
+            int row = 0, col = 1;
+            for (int i = 0; i < this->row; i++) //找到非对角线最大元素
+            {
+                for (int j = 0; j < this->col; j++) {
+                    T d = fabs(this->getByIndex(i, j));
+                    if (i != j && d > max) {
+                        max = d;
+                        row = i;
+                        col = j;
+                    }
+                }
+            }
+            if (max < error || count > iterator) {
+                break;
+            }
+            count++;
+            T pp = this->getByIndex(row, row);
+            T pq = this->getByIndex(row, col);
+            T qq = this->getByIndex(col, col);
+            //设置旋转角度
+            T Angle = 0.5 * atan2(-2 * pq, qq - pp);
+            T Sin = sin(Angle);
+            T Cos = cos(Angle);
+            T Sin2 = sin(2 * Angle);
+            T Cos2 = cos(2 * Angle);
+            this->setByIndex(row, row, pp * Cos * Cos + qq * Sin * Sin + 2 * pq * Cos * Sin);
+            this->setByIndex(col, col, pp * Sin * Sin + qq * Cos * Cos - 2 * pq * Cos * Sin);
+            this->setByIndex(row, col, (qq - pp) * Sin2 / 2 + pq * Cos2);
+            this->setByIndex(col, row, this->getByIndex(row, col));
+            for (int i = 0; i < this->col; i++) {
+                if (i != col && i != row) {
+                    max = this->getByIndex(i, row);
+                    this->setByIndex(i, row, this->getByIndex(i, col) * Sin + max * Cos);
+                    this->setByIndex(i, col, this->getByIndex(i, col) * Cos - max * Sin);
+                }
+            }
+            for (int j = 0; j < this->col; j++) {
+                if (j != col && j != row) {
+                    max = this->getByIndex(row, j);
+                    this->setByIndex(row, j, this->getByIndex(col, j) * Sin + max * Cos);
+                    this->setByIndex(col, j, this->getByIndex(col, j) * Cos - max * Sin);
+                }
+            }
+            //计算特征向量
+            for (int i = 0; i < this->col; i++) {
+                max = eigenvector.getByIndex(i, row);
+                eigenvector.setByIndex(i, row, eigenvector.getByIndex(i, col) * Sin + max * Cos);
+                eigenvector.setByIndex(i, col, eigenvector.getByIndex(i, col) * Cos - max * Sin);
+            }
+        }
+        map<T, int> mapEigen;
+        for (int i = 0; i < this->col; i++) {
+            eigenvalue.setByIndex(i, i, this->getByIndex(i, i));
+            mapEigen.insert(make_pair(eigenvalue.getByIndex(i, i), i));
+        }
+
+        SparseMatrix<T> temp(this->col, this->col);
+        typename map<T, int>::reverse_iterator it = mapEigen.rbegin();
+        for (int j = 0; it != mapEigen.rend(), j < this->col; it++, j++) {
+            for (int i = 0; i < this->col; i++) {
+                temp.setByIndex(i, j, eigenvector.getByIndex(i, it->second));
+            }
+            eigenvalue.setByIndex(j, j, it->first);
+        }
+
+        for (int i = 0; i < this->col; i++) {
+            T sum = 0;
+            for (int j = 0; j < this->col; j++) {
+                sum += temp.getByIndex(j, i);
+            }
+            if (sum < 0) {
+                for (int j = 0; j < this->col; j++) {
+                    temp.setByIndex(j, i, -temp.getByIndex(j, i));
+                }
+            }
+        }
+        eigenvector = temp;
+        return true;
     }
 
     template<class T>
@@ -925,7 +1031,8 @@ namespace mat {
 
     template<class T>
     void SparseMatrix<T>::show() {
-        using namespace std;
+        if(this->getSize() < 2e5)
+        {cout << "Sparse Matrix:" << endl;
         T mat[this->getRow()][this->getCol()];
         memset(mat, 0, sizeof(mat));
         for (auto i = tri_map.begin(); i != tri_map.end(); i++) {
@@ -937,8 +1044,13 @@ namespace mat {
                 cout << mat[i][j] << " ";
             }
             cout << endl;
+        }}else{
+            for (auto it = this->tri_map.begin(); it != this->tri_map.end(); it++)
+            {
+                Triple<T>* tri = it->second;
+                cout<<"row="<<tri->_row<<" col="<<tri->_col<<" val="<<tri->val<<endl;
+            }
         }
-        cout << endl;
     }
 }
 
