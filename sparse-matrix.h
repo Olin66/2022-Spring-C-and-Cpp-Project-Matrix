@@ -101,6 +101,8 @@ namespace mat {
 
         void conjugate();
 
+        bool getEigen(SparseMatrix<T> &eigenvector, SparseMatrix<T> &eigenvalue, double error, double iterator);
+
         T getMax();
 
         T getMin();
@@ -125,7 +127,7 @@ namespace mat {
 
         T getColAvg(int);
 
-    T getEigenvalue(int LoopNumber,  BasicMatrix<T> &result);
+    T getEigenvalue(int LoopNumber,  SparseMatrix<T> &result);
 
     void Gaussian_Eliminate(SparseMatrix<T>&ans,SparseMatrix<T>&eigenmatirx);
 
@@ -201,7 +203,98 @@ namespace mat {
             }
         }
     }
+ template <class T>
+    bool SparseMatrix<T>::getEigen(SparseMatrix<T> &eigenvector, SparseMatrix<T> &eigenvalue, double error, double iterator) {
+        for (int i = 0; i < this->col; i++) {
+            eigenvector.setByIndex(i, i, 1.0);
+            for (int j = 0; j < this->col; j++) {
+                if (i != j) {
+                    eigenvector.setByIndex(i, j, 0.0);
+                }
+            }
+        }
+        int count = 0;
+        while (true) {
+            T max = this->getByIndex(0, 1);
+            int row = 0, col = 1;
+            for (int i = 0; i < this->row; i++) //找到非对角线最大元素
+            {
+                for (int j = 0; j < this->col; j++) {
+                    T d = fabs(this->getByIndex(i, j));
+                    if (i != j && d > max) {
+                        max = d;
+                        row = i;
+                        col = j;
+                    }
+                }
+            }
+            if (max < error || count > iterator) {
+                break;
+            }
+            count++;
+            T pp = this->getByIndex(row, row);
+            T pq = this->getByIndex(row, col);
+            T qq = this->getByIndex(col, col);
+            //设置旋转角度
+            T Angle = 0.5 * atan2(-2 * pq, qq - pp);
+            T Sin = sin(Angle);
+            T Cos = cos(Angle);
+            T Sin2 = sin(2 * Angle);
+            T Cos2 = cos(2 * Angle);
+            this->setByIndex(row, row, pp * Cos * Cos + qq * Sin * Sin + 2 * pq * Cos * Sin);
+            this->setByIndex(col, col, pp * Sin * Sin + qq * Cos * Cos - 2 * pq * Cos * Sin);
+            this->setByIndex(row, col, (qq - pp) * Sin2 / 2 + pq * Cos2);
+            this->setByIndex(col, row, this->getByIndex(row, col));
+            for (int i = 0; i < this->col; i++) {
+                if (i != col && i != row) {
+                    max = this->getByIndex(i, row);
+                    this->setByIndex(i, row, this->getByIndex(i, col) * Sin + max * Cos);
+                    this->setByIndex(i, col, this->getByIndex(i, col) * Cos - max * Sin);
+                }
+            }
+            for (int j = 0; j < this->col; j++) {
+                if (j != col && j != row) {
+                    max = this->getByIndex(row, j);
+                    this->setByIndex(row, j, this->getByIndex(col, j) * Sin + max * Cos);
+                    this->setByIndex(col, j, this->getByIndex(col, j) * Cos - max * Sin);
+                }
+            }
+            //计算特征向量
+            for (int i = 0; i < this->col; i++) {
+                max = eigenvector.getByIndex(i, row);
+                eigenvector.setByIndex(i, row, eigenvector.getByIndex(i, col) * Sin + max * Cos);
+                eigenvector.setByIndex(i, col, eigenvector.getByIndex(i, col) * Cos - max * Sin);
+            }
+        }
+        map<T, int> mapEigen;
+        for (int i = 0; i < this->col; i++) {
+            eigenvalue.setByIndex(i, i, this->getByIndex(i, i));
+            mapEigen.insert(make_pair(eigenvalue.getByIndex(i, i), i));
+        }
 
+        SparseMatrix<T> temp(this->col, this->col);
+        typename map<T, int>::reverse_iterator it = mapEigen.rbegin();
+        for (int j = 0; it != mapEigen.rend(), j < this->col; it++, j++) {
+            for (int i = 0; i < this->col; i++) {
+                temp.setByIndex(i, j, eigenvector.getByIndex(i, it->second));
+            }
+            eigenvalue.setByIndex(j, j, it->first);
+        }
+
+        for (int i = 0; i < this->col; i++) {
+            T sum = 0;
+            for (int j = 0; j < this->col; j++) {
+                sum += temp.getByIndex(j, i);
+            }
+            if (sum < 0) {
+                for (int j = 0; j < this->col; j++) {
+                    temp.setByIndex(j, i, -temp.getByIndex(j, i));
+                }
+            }
+        }
+        eigenvector = temp;
+        return true;
+    }
     template<class T>
     SparseMatrix<T>::SparseMatrix(int row, int col, T *_data): Matrix<T>(row, col) {
         for (size_t i = 0; i < this->getSize(); i++) {
@@ -268,6 +361,7 @@ namespace mat {
             auto tri = it->second;
             this->setByIndex(tri->_row, tri->_col, tri->val);
         }
+        return *this;
     }
 
     template<class T>
@@ -395,7 +489,7 @@ namespace mat {
             for (auto j = right.tri_map.begin(); j != right.tri_map.end(); j++) {
                 Triple<T> *trj = j->second;
                 if (tri->_col == trj->_row) {
-                    cout << tri->_row << " " << trj->_col << " " << tri->val << " " << trj->val << endl;
+                    //cout << tri->_row << " " << trj->_col << " " << tri->val << " " << trj->val << endl;
                     mat.setByIndex(tri->_row, trj->_col, mat.getByIndex(tri->_row, trj->_col) + tri->val * trj->val);
                 }
             }
@@ -593,7 +687,7 @@ void SparseMatrix<T>::transpose() {
     }
 
     template <class T>
-    T SparseMatrix<T>::getEigenvalue(int LoopNumber,  BasicMatrix<T> &result) {
+    T SparseMatrix<T>::getEigenvalue(int LoopNumber,  SparseMatrix<T> &result) {
         if (this->col != this->row) {
             throw ex::NotSquareException(this->row, this->col, "eigen value");
         }
@@ -622,7 +716,7 @@ void SparseMatrix<T>::transpose() {
 
     template <class T>
     SparseMatrix<T> &SparseMatrix<T>::getEigenvector(SparseMatrix<T> &eigenvector,const T lamda) {
-        BasicMatrix<T>eigenM(this->col,this->row);
+        SparseMatrix<T>eigenM(this->col,this->row);
         for (int i = 0; i <this->row; i++)
         {
             for (int j = 0; j <this->col; j++)
