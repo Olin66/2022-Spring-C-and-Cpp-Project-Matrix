@@ -37,7 +37,7 @@ namespace mat {
 
                 InvalidSizeException(std::string m, int ch, int i1, int i2): message(m), choice(ch), i1(i1), i2(i2) {};
 
-                const char * what() override{
+               /* const char * what() override{
                     switch (choice)
                     {
                     case 1:
@@ -50,7 +50,7 @@ namespace mat {
                     default:
                         return "";
                     }
-                }
+                }*/
         };
 
         class DuplicatedTripleException: public MatrixException{

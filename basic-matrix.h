@@ -385,6 +385,7 @@ namespace mat {
         {
             throw ex::NoInverseException(*this, "matrix inverse");
         }
+        
         BasicMatrix<T> temp(this->row - 1, this->col - 1);
         BasicMatrix<T> adjoint(this->row, this->col);
         if (this->col == 1) {
