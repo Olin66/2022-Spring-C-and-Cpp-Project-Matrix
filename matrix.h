@@ -19,10 +19,15 @@ namespace mat {
 
     namespace ex {
         class MatrixException;
+
         class MismatchedSizeException;
+
         class DuplicatedTripleException;
+
         class NotSquareException;
+
         class NoInverseException;
+
         class InvalidSizeException;
     }
 
@@ -44,11 +49,11 @@ namespace mat {
             this->size = this->row * this->col;
         }
 
-       Matrix(const Mat &mat) {
-           this->row = mat.rows;
-           this->col = mat.cols;
-           this->size = this->row * this->col;
-       }
+        Matrix(const Mat &mat) {
+            this->row = mat.rows;
+            this->col = mat.cols;
+            this->size = this->row * this->col;
+        }
 
         void setSize(const long size) {
             this->size = size;
@@ -62,15 +67,15 @@ namespace mat {
             this->col = col;
         }
 
-        int getSize() const{
+        int getSize() const {
             return this->size;
         }
 
-        int getRow() const{
+        int getRow() const {
             return this->row;
         }
 
-        int getCol() const{
+        int getCol() const {
             return this->col;
         }
 
@@ -132,32 +137,24 @@ namespace mat {
             cout << "Base class Matrix" << endl;
         }
 
-        virtual Mat* getCvMat() = 0;
+        virtual Mat *getCvMat() = 0;
 
-        static Matrix<T> * eye(int row, int col, MATRIX_TYPE type){
+        static Matrix<T> *eye(int row, int col, MATRIX_TYPE type) {
             if (row <= 0 || col <= 0) {
                 throw ex::InvalidSizeException("creating Matrix", 1, row, col);
             }
-            Matrix<T>* mat;
-            if (type){
+            Matrix<T> *mat;
+            if (type) {
                 mat = new BasicMatrix<T>(row, col);
                 for (size_t i = 0; i < row; i++)
                     mat->setByIndex(i, i, 1);
-            } else{
+            } else {
                 mat = new SparseMatrix<T>(row, col);
                 for (size_t i = 0; i < row; i++)
-                    mat->setByIndex(i,i,1);
+                    mat->setByIndex(i, i, 1);
             }
             return mat;
         }
-
-        // template<typename P>
-        // P zero(T val){
-        //     if (typeid(val) == typeid(double)) return 0e1;
-        //     if (typeid(val) == typeid(int)) return 0;
-        //     if (typeid(val) == typeid(complex<double>)) return complex<double>(0e1);
-        //     if (typeid(val) == typeid(complex<int>)) return complex<int>(0);
-        // }
 
     };
 
