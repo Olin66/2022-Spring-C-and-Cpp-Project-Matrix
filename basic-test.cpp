@@ -14,7 +14,7 @@ void test() {
 
 void bmat_multi_test1() {
     cout << "Basic matrix<int> multiplication test1 begin:" << endl;
-    BASIC_MATRIX_INT *bm1 = new BASIC_MATRIX_INT(4, 4, 2);
+    BASIC_MATRIX_INT *bm1 = new BASIC_MATRIX_INT(4, 1, 2);
     cout << "Matrix 1:" << endl;
     bm1->show();
     Matrix<int> * m = Matrix<int>::eye(4, 4, BASIC_MATRIX);
@@ -74,6 +74,25 @@ void bmat_multi_test3() {
     bm2->show();
     cout << "Matrix 1 cross product matrix 2(new matrix 1:"  << endl;
     bm1->crossProduct(*bm2);
+    bm1->show();
+    delete bm1;
+    delete bm2;
+    cout << "test end" << endl << endl;
+}
+
+void bmat_multi_test4() {
+    cout << "Basic matrix<int> multiplication test4 begin:" << endl;
+    BASIC_MATRIX_INT *bm1 = new BASIC_MATRIX_INT(4, 1, 2);
+    cout << "Matrix 1:" << endl;
+    bm1->show();
+    BASIC_MATRIX_INT *bm2 = (BASIC_MATRIX_INT*)Matrix<int>::eye(4, 4, BASIC_MATRIX);
+    cout << "Matrix 2:" << endl;
+    bm2->show();
+    bm1->dotProduct(*bm2);
+    cout << "Matrix 1 dot product matrix 2(new matrix 1):" << endl;
+    bm1->show();
+    cout << "Matrix 1 cross product matrix 1(new matrix 1):" << endl;
+    bm1->crossProduct(*bm1);
     bm1->show();
     delete bm1;
     delete bm2;
