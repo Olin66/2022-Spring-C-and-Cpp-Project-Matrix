@@ -281,7 +281,7 @@ namespace mat {
     template<class T>
     T SparseMatrix<T>::getByIndex(int _row, int _col) const {
         int index = _row * this->col + _col;
-        if (tri_map.find(index)->second == nullptr)
+        if (tri_map.find(index) == tri_map.end())
             return 0;
         else
             return tri_map.find(index)->second->val;
@@ -289,10 +289,9 @@ namespace mat {
 
     template<class T>
     void SparseMatrix<T>::setByIndex(int _row, int _col, T val) {
-        long index = _row * this->col + _col;
+        int index = _row * this->col + _col;
         if (tri_map[index] == nullptr) {
-            Triple<T> *t = new Triple<T>(_row, _col, val);
-            tri_map[index] = t;
+            tri_map[index] = new Triple<T>(_row, _col, val);
         } else {
             tri_map[index]->val = val;
         }
@@ -395,7 +394,6 @@ namespace mat {
             for (auto j = right.tri_map.begin(); j != right.tri_map.end(); j++) {
                 Triple<T> *trj = j->second;
                 if (tri->_col == trj->_row) {
-                    cout << tri->_row << " " << trj->_col << " " << tri->val << " " << trj->val << endl;
                     mat.setByIndex(tri->_row, trj->_col, mat.getByIndex(tri->_row, trj->_col) + tri->val * trj->val);
                 }
             }
@@ -940,6 +938,7 @@ namespace mat {
             }
             cout << endl;
         }
+        cout << endl;
     }
 }
 

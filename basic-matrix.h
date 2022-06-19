@@ -72,8 +72,8 @@ namespace mat {
         void reverse();
 
         void conjugate();
-        
-    T getByIndex(int, int) const;
+
+        T getByIndex(int, int) const;
 
         void setByIndex(int, int, T);
 
@@ -101,21 +101,21 @@ namespace mat {
 
         T getColAvg(int);
 
-    void Gaussian_Eliminate(BasicMatrix<T>&ans,BasicMatrix<T>&eigenmatirx);
+        void Gaussian_Eliminate(BasicMatrix<T>&ans,BasicMatrix<T>&eigenmatirx);
 
-    bool getEigenvalue(int LoopNumber,  BasicMatrix<T> &result);
+        bool getEigenvalue(int LoopNumber,  BasicMatrix<T> &result);
 
-    void QR(BasicMatrix<T>&Q,BasicMatrix<T>&R);
+        void QR(BasicMatrix<T>&Q,BasicMatrix<T>&R);
 
-    BasicMatrix<T> &getEigenvector(BasicMatrix<T> &eigenvector,const T lamda);
+        BasicMatrix<T> &getEigenvector(BasicMatrix<T> &eigenvector,const T lamda);
 
         T getTrace();
 
         T getDeterminant();
 
-    bool getEigen(BasicMatrix<T> &eigenvector, BasicMatrix<T> &eigenvalue, double error, double iterator);//雅克比法计算特征值和特征向量
+        bool getEigen(BasicMatrix<T> &eigenvector, BasicMatrix<T> &eigenvalue, double error, double iterator);//雅克比法计算特征值和特征向量
 
-    void reshape(int row, int col);
+        void reshape(int row, int col);
 
         void loop(T[]);
 
@@ -385,7 +385,7 @@ namespace mat {
         {
             throw ex::NoInverseException(*this, "matrix inverse");
         }
-        
+
         BasicMatrix<T> temp(this->row - 1, this->col - 1);
         BasicMatrix<T> adjoint(this->row, this->col);
         if (this->col == 1) {
@@ -479,37 +479,37 @@ namespace mat {
 
     template <class T>
     T BasicMatrix<T>::getAvg() {
-        int sum = getSum();
+        T sum = getSum();
         return sum / this->getSize();
     }
 
     template <class T>
-bool BasicMatrix<T>::getEigenvalue(int LoopNumber,  BasicMatrix<T> &result) {
-    if (this->col != this->row) {
-        throw ex::NotSquareException(this->row, this->col, "eigen value");
+    bool BasicMatrix<T>::getEigenvalue(int LoopNumber,  BasicMatrix<T> &result) {
+        if (this->col != this->row) {
+            throw ex::NotSquareException(this->row, this->col, "eigen value");
+        }
+        BasicMatrix<T> tempA (*this);//这是一个临时的矩阵，用来保存每一次被QR分解迭代的对象
+        BasicMatrix<T> tempR(this->row,this->col);
+        BasicMatrix<T>  tempQ(this->row,this->col);
+
+        for (int i = 0; i < LoopNumber; i++) {
+            tempA.QR(tempQ, tempR);
+            BasicMatrix<T>tempRR(tempR);
+            tempRR.crossProduct(tempQ);
+            tempA = tempRR ;//下一次迭代的矩阵由RQ = Q'AQ给出
+
+        }
+        for (int i = 0; i < this->row; i++) {
+            for (int j = 0; j < this->col; j++) {
+                if (i == j)
+                    continue;
+                tempA.setByIndex(i, j, 0);
+            }
+        }//将对角阵的非对角元写成0
+        //totalQ = totalQ.transpose();
+        result = tempA;
+        return true;
     }
-    BasicMatrix<T> tempA (*this);//这是一个临时的矩阵，用来保存每一次被QR分解迭代的对象
-	BasicMatrix<T> tempR(this->row,this->col);
-    BasicMatrix<T>  tempQ(this->row,this->col);
-    
-	for (int i = 0; i < LoopNumber; i++) {
-		tempA.QR(tempQ, tempR);
-        BasicMatrix<T>tempRR(tempR);
-        tempRR.crossProduct(tempQ);
-		tempA = tempRR ;//下一次迭代的矩阵由RQ = Q'AQ给出
-        
-	}
-	for (int i = 0; i < this->row; i++) {
-		for (int j = 0; j < this->col; j++) {
-			if (i == j)
-				continue;
-			tempA.setByIndex(i, j, 0);
-		}
-	}//将对角阵的非对角元写成0
-	//totalQ = totalQ.transpose();
-	result = tempA;
-    return true;
-}
 
     template <class T>
     T BasicMatrix<T>::getRowMin(int row) {
@@ -844,8 +844,8 @@ bool BasicMatrix<T>::getEigenvalue(int LoopNumber,  BasicMatrix<T> &result) {
         }
         return det;
     }
-    
-    
+
+
 
     template <class T>
     void BasicMatrix<T>::reshape(int row, int col) {
