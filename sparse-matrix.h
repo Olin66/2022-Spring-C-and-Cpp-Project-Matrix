@@ -4,16 +4,16 @@
 #include "matrix.h"
 #include "basic-matrix.h"
 #include "matrix-ex.h"
-// #include <opencv2/opencv.hpp>
+#include <opencv2/opencv.hpp>
 #include <cstring>
 #include <iostream>
-#include <cmath>
+#include <math.h>
 #include <string>
 #include <vector>
 #include <set>
 #include <map>
 using namespace std;
-// using namespace cv;
+using namespace cv;
 namespace mat {
     namespace ex {
         class MatrixException;
@@ -65,7 +65,7 @@ namespace mat {
     public:
         SparseMatrix(int, int);
 
-        // SparseMatrix(const cv::Mat &mat);
+        SparseMatrix(const cv::Mat &mat);
 
         SparseMatrix(vector<vector<T>>);
 
@@ -125,12 +125,12 @@ namespace mat {
 
         T getColAvg(int);
 
-    T getEigenvalue(int LoopNumber,  BasicMatrix<T> &result);
+        T getEigenvalue(int LoopNumber,  SparseMatrix<T> &result);
 
-    void Gaussian_Eliminate(SparseMatrix<T>&ans,SparseMatrix<T>&eigenmatirx);
+        void Gaussian_Eliminate(SparseMatrix<T>&ans,SparseMatrix<T>&eigenmatirx);
 
         SparseMatrix<T> &getEigenvector(SparseMatrix<T> &eigenvector,const T lamda);
-
+        
         T getByIndex(int _row, int _col) const;
 
         void setByIndex(int _row, int _col, T val);
@@ -159,37 +159,37 @@ namespace mat {
 
         void show();
 
-        // cv::Mat* getCvMat();
+        cv::Mat* getCvMat();
     };
 
-    // template<class T>
-    // Mat* SparseMatrix<T>::getCvMat(){
-    //     Mat* mat = new Mat(this->getRow(), this->getCol(), CV_8UC1);
-    //     for (auto it = tri_map.begin(); it != tri_map.end(); it++)
-    //     {
-    //         auto tri = it->second;
-    //         double re = real(getByIndex(tri->_row, tri->_col));
-    //         mat->at<double>(tri->_row, tri->_col) = re;
-    //     }
-    //     return mat;
-    // }
+    template<class T>
+    Mat* SparseMatrix<T>::getCvMat(){
+        Mat* mat = new Mat(this->getRow(), this->getCol(), CV_8UC1);
+        for (auto it = tri_map.begin(); it != tri_map.end(); it++)
+        {
+            auto tri = it->second;
+            double re = real(getByIndex(tri->_row, tri->_col));
+            mat->at<double>(tri->_row, tri->_col) = re;
+        }
+        return mat;
+    }
 
     template<class T>
     SparseMatrix<T>::SparseMatrix(int row, int col): Matrix<T>(row, col) {}
 
-    // template<class T>
-    // SparseMatrix<T>::SparseMatrix(const cv::Mat &mat): Matrix<T>(mat) {
-    //     if (mat.channels() != 1)
-    //         throw ex::InvalidChannelDepth(mat.channels());
-    //     for (size_t i = 0; i < this->getRow(); i++)
-    //     {
-    //         for (size_t j = 0; j < this->getCol(); j++)
-    //         {
-    //             if ((T)mat.at<uchar>(i,j) != 0)
-    //                 setByIndex(i, j, (T)mat.at<uchar>(i,j));
-    //         }
-    //     }
-    // }
+    template<class T>
+    SparseMatrix<T>::SparseMatrix(const cv::Mat &mat): Matrix<T>(mat) {
+        if (mat.channels() != 1)
+            throw ex::InvalidChannelDepth(mat.channels());
+        for (size_t i = 0; i < this->getRow(); i++)
+        {
+            for (size_t j = 0; j < this->getCol(); j++)
+            {
+                if ((T)mat.at<uchar>(i,j) != 0)
+                    setByIndex(i, j, (T)mat.at<uchar>(i,j));
+            }
+        }
+    }
 
     template<class T>
     SparseMatrix<T>::SparseMatrix(vector<vector<T>> mat): Matrix<T>(mat.size(), mat[0].size()) {
@@ -403,47 +403,14 @@ namespace mat {
         *this = mat;
     }
 
-template <class T>
-void SparseMatrix<T>::transpose() {
-    SparseMatrix<T> mat(this->col, this->row);
-    for (int i = 0; i < this->row; i++) {
-        for (int j = 0; j < this->col; j++) {
-            mat.setByIndex(j, i, this->getByIndex(i, j));
-        }
+    template<class T>
+    void SparseMatrix<T>::transpose() {
+
     }
-    *this = mat;
-}
 
     template<class T>
     void SparseMatrix<T>::inverse() {
-        T det = this->getDeterminant();
-        if (this->col != this->col || det == 0) //行列式为0的矩阵不可逆
-        {
-            throw ex::NoInverseException(*this, "matrix inverse");
-        }
-        SparseMatrix<T> temp(this->row - 1, this->col - 1);
-        SparseMatrix<T> adjoint(this->row, this->col);
-        if (this->col == 1) {
-            return; //一阶矩阵逆是本身
-        }
-        for (int i = 0; i < this->col; i++) {
-            for (int j = 0; j < this->col; j++) {
-                for (int k = 0; k < this->col - 1; k++) {
-                    for (int l = 0; l < this->col - 1; l++) {
-                        temp.setByIndex(k, l, this->getByIndex(k >= i ? k + 1 : k, l >= j ? l + 1 : l));
-                    }
-                }
-                adjoint.setByIndex(j, i, temp.getDeterminant()); //进行了一次转置。
-                if ((i + j) % 2 == 1) {
-                    adjoint.setByIndex(j, i, -adjoint.getByIndex(j, i)); //将每一个元素的代数余子式加上正负号生成伴随矩阵
-                }
-            }
-        }
-        for (int i = 0; i < this->col; i++) {
-            for (int j = 0; j < this->row; j++) {
-                this->setByIndex(i, j, adjoint.getByIndex(i, j) / det);
-            }
-        }
+
     }
 
     template<class T>
@@ -460,14 +427,7 @@ void SparseMatrix<T>::transpose() {
 
     template<class T>
     void SparseMatrix<T>::conjugate() {
-        for (int i = 0; i < this->row; i++) {
-            for (int j = 0; j < this->col; j++) {
-                if (imag(this->getByIndex(i, j)) != 0) {
-                    T temp = real(this->getByIndex(i, j)) - imag(this->getByIndex(i, j));
-                    this->setByIndex(i, j, temp);
-                }
-            }
-        }
+
     }
 
     template<class T>
@@ -593,7 +553,7 @@ void SparseMatrix<T>::transpose() {
     }
 
     template <class T>
-    T SparseMatrix<T>::getEigenvalue(int LoopNumber,  BasicMatrix<T> &result) {
+    T SparseMatrix<T>::getEigenvalue(int LoopNumber,  SparseMatrix<T> &result) {
         if (this->col != this->row) {
             throw ex::NotSquareException(this->row, this->col, "eigen value");
         }
@@ -622,7 +582,7 @@ void SparseMatrix<T>::transpose() {
 
     template <class T>
     SparseMatrix<T> &SparseMatrix<T>::getEigenvector(SparseMatrix<T> &eigenvector,const T lamda) {
-        BasicMatrix<T>eigenM(this->col,this->row);
+        SparseMatrix<T>eigenM(this->col,this->row);
         for (int i = 0; i <this->row; i++)
         {
             for (int j = 0; j <this->col; j++)
@@ -766,7 +726,6 @@ void SparseMatrix<T>::transpose() {
         for (int i = 0; i < exp; i++)
             this->crossProduct(temp);
     }
-
 
     template <class T>
     void SparseMatrix<T>::QR(SparseMatrix<T>&Q,SparseMatrix<T>&R){
