@@ -469,7 +469,7 @@ namespace mat {
 
     template <class T>
     T BasicMatrix<T>::getAvg() {
-        int sum = getSum();
+        T sum = getSum();
         return sum / this->getSize();
     }
 
@@ -1012,12 +1012,12 @@ namespace mat {
     template <class T>
     void BasicMatrix<T>::show() {
         using namespace std;
-        cout << "Basic Matrix:" << endl;
         for (int i = 0; i < this->row; i++) {
             for (int j = 0; j < this->col; j++)
                 cout << getByIndex(i, j) << " ";
             cout << endl;
         }
+        cout << endl;
     }
 
     template <class T>

@@ -59,7 +59,7 @@ namespace mat {
             this->col = col;
         }
 
-        long getSize() const{
+        int getSize() const{
             return this->size;
         }
 
@@ -137,7 +137,7 @@ namespace mat {
             if (type){
                 mat = new BasicMatrix<T>(row, col);
                 for (size_t i = 0; i < row; i++)
-                    mat.setByIndex(i, i, 1);
+                    mat->setByIndex(i, i, 1);
             } else{
                 mat = new SparseMatrix<T>(row, col);
                 for (size_t i = 0; i < row; i++)
@@ -147,6 +147,26 @@ namespace mat {
         }
     };
 
+    template<typename P>
+    bool operator<(complex<P> c1, complex<P> c2) {
+        return c1.imag() * c1.imag() + c1.real() * c1.real() < c2.imag() * c2.imag() + c2.real() * c2.real();
+    }
+
+    template<typename P>
+    bool operator>(complex<P> c1, complex<P> c2) {
+        return c2 < c1 || c2 == c1;
+    }
+
+    // template<typename P>
+    // std::ostream& operator<<(std::ostream& os, complex<P> c) {
+    //     os << c.real << (c.imag > (P)0 ? "+" : "") << c.imag << std::endl;
+    //     return os;
+    // }
+
+    // template<typename P>
+    // complex<P> operator/(complex<P> c, int t) {
+    //     return complex(c.real()/t, c.imag()/t);
+    // }
 }
 
 #endif
