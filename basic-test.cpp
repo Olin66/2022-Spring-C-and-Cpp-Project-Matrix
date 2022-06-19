@@ -70,28 +70,42 @@ void bmat_multi_test3() {
     cout << "Matrix 1 dot product matrix 2(new matrix 1):" << endl;
     bm1->dotProduct(*bm2);
     bm1->show();
+    cout << "Matrix 2:" << endl;
+    bm2->show();
+    cout << "Matrix 1 cross product matrix 2(new matrix 1:"  << endl;
+    bm1->crossProduct(*bm2);
+    bm1->show();
     delete bm1;
     delete bm2;
     cout << "test end" << endl << endl;
 }
 
 void smat_multi_test1() {
-    // cout << "Sparse matrix<int> multiplication test1 begin:" << endl;
-    // SPARSE_MATRIX_INT *bm1 = new SPARSE_MATRIX_INT(4, 4, 2);
-    // cout << "Matrix 1:" << endl;
-    // bm1->show();
-    // Matrix<int> * m = Matrix<int>::eye(4, 4, BASIC_MATRIX);
+    cout << "Sparse matrix<int> multiplication test1 begin:" << endl;
+    vector<Triple<int>> tri1;
+    tri1.push_back(Triple<int>(1, 2, 1));
+    tri1.push_back(Triple<int>(4, 4, 1));
+    vector<Triple<int>> tri2;
+    tri2.push_back(Triple<int>(1, 1, 1));
+    tri2.push_back(Triple<int>(2, 1, 1));
+    tri2.push_back(Triple<int>(3, 1, 1));
+    SPARSE_MATRIX_INT *bm1 = new SPARSE_MATRIX_INT(5, 5, tri1);
+    cout << "Matrix 1:" << endl;
+    bm1->show();
+    SPARSE_MATRIX_INT *bm2 = new SPARSE_MATRIX_INT(5, 2, tri2);
+    cout << "Matrix 2:" << endl;
+    bm2->show();
     // cout << "Matrix 2:" << endl;
-    // m->show();
+    // bm2->show();
     // ((BasicMatrix<int>*)m)->dotProduct(*bm1);
     // cout << "Matrix 2 dot product matrix 1(new matrix 2):" << endl;
-    // m->show();
-    // cout << "Matrix 1 cross product matrix 2(new matrix 1):" << endl;
-    // bm1->crossProduct(*((SPARSE_MATRIX_INT*)m));
-    // bm1->show();
-    // delete bm1;
-    // delete m;
-    // cout << "test end" << endl << endl;
+    // bm2->show();
+    cout << "Matrix 1 cross product matrix 2(new matrix 1):" << endl;
+    bm1->crossProduct(*bm2);
+    bm1->show();
+    delete bm1;
+    delete bm2;
+    cout << "test end" << endl << endl;
 }
 
 void smat_multi_test2() {
@@ -133,7 +147,56 @@ void smat_multi_test3() {
     cout << "Matrix 1 dot product matrix 2(new matrix 1):" << endl;
     bm1->dotProduct(*bm2);
     bm1->show();
+    cout << "Matrix 2:" << endl;
+    bm2->show();
+    cout << "Matrix 1 cross product matrix 2(new matrix 1:"  << endl;
+    bm1->crossProduct(*bm2);
+    bm1->show();
     delete bm1;
     delete bm2;
     cout << "test end" << endl << endl;
+}
+
+void bmat_conv_test1() {
+    cout << "Basic matrix convolution test begin:" << endl;
+    const int TEST_SIZE = 16;
+    int *_data1 = new int[TEST_SIZE]{
+        1, 2, 3, 4,
+        5, 6, 7, 8,
+        9, 10, 11, 12,
+        13, 14, 15, 16};
+    BASIC_MATRIX_INT bm1(4, 4, _data1);
+
+    int *_data2 = new int[9]{
+        -1, -2, -1,
+        0, 0, 0,
+        1, 2, 1};
+    BASIC_MATRIX_INT bm2(3, 3, _data2);
+    bm1.show();
+    bm2.show();
+    BASIC_MATRIX_INT* mat_ans = bm1.convolve(bm2, 1, 1);
+    cout << " Answer of matrix convolution" << endl;
+    mat_ans->show();
+    cout << "Test end." << endl << endl; 
+}
+
+void smat_conv_test1() {
+    cout << "Sparse matrix convolution begin:" << endl;
+    const int TEST_SIZE = 16;
+    vector<Triple<int>> tri1;
+    tri1.push_back(Triple<int>(1, 2, 1));
+    tri1.push_back(Triple<int>(4, 4, 1));
+    vector<Triple<int>> tri2;
+    tri2.push_back(Triple<int>(0, 0, 1));
+    tri2.push_back(Triple<int>(1, 2, -1));
+    SPARSE_MATRIX_INT bm1(5, 5, tri1);
+    SPARSE_MATRIX_INT bm2(3, 3, tri2);
+    cout << "Matrix 1:" << endl;
+    bm1.show();
+    cout << "Matrix 2:" << endl;
+    bm2.show();
+    SPARSE_MATRIX_INT* mat_ans = bm1.convolve(bm2, 1, 0);
+    cout << " Answer of matrix convolution(stride=1, padding=0)" << endl;
+    mat_ans->show();
+    cout << "Test end." << endl;
 }
