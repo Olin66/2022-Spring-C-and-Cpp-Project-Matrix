@@ -1,4 +1,4 @@
-# 2022-Spring-C-and-C++-Project-Matrix
+# 2022 Spring C and C++ Project Matrix
 
 **Group Members:**
 
